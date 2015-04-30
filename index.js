@@ -1,22 +1,18 @@
 
-var npm = require('npm')
-	util = require('util')
+var util = require('util')
 	fs = require('fs')
 	async = require('async')
 	semver = require('semver')
-	checkDependencies = require('./lib/check.js')
+	checker = require('./lib/check.js')
+	updater = require('./lib/update.js')
 	context = require('./lib/context.js')
 
-// read package.json
-// on a timer...
-
-
-function ElectronUpdater() {
-
-}
-
 function update(callback) {
-
+	check(function (err, results) {
+		if(err) return callback(err)
+		if(!results) return callback()
+		updater.update(results, callback);
+	})
 }
 
 function watch(callback) {
@@ -34,7 +30,7 @@ function check(callback) {
 			{ context: ctx, kind: 'dependencies' },
 			{ context: ctx, kind: 'plugins' }
 		],
-		checkDependencies,
+		checker.check,
 		function (err, results) {
 			if(err) return callback(err)
 			var dependencies = results[0].filter(defined)
@@ -43,6 +39,7 @@ function check(callback) {
 				callback()
 			} else {
 				callback(null, {
+					context: ctx,
 					dependencies: dependencies,
 					plugins: plugins
 				})
@@ -57,8 +54,9 @@ function list(callback) {
 	})
 }
 
-ElectronUpdater.prototype.update = update
-ElectronUpdater.prototype.watch = watch
-ElectronUpdater.prototype.check = check
-ElectronUpdater.prototype.list = list
-module.exports = ElectronUpdater
+module.exports = {
+	update: update,
+	watch: watch,
+	check: check,
+	list: list
+}

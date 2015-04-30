@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-var ElectronUpdater = require('../index.js')
+var updater = require('../index.js')
 	program = require('commander')
 	util = require('util')
 
 var help = true
-var updater = new ElectronUpdater()
 program.version('1.0.0')
 program
 	.command('check')

@@ -26,7 +26,8 @@
   "dependencies": {
     "async": "^0.9.0",
     "npm": "2.7.0",
-    "semver": "^4.3.3"
+    "semver": "^4.3.3",
+    "tar-stream": "^1.1.4"
   },
   "devDependencies": {
     "commander": "^2.8.1"
