@@ -3,20 +3,32 @@
   "version": "1.0.0",
   "description": "Cross platform auto-updater for electron applications",
   "main": "index.js",
-  "scripts": {
-    "test": "mocha"
-  },
+  "author": "Evolve LLC",
+  "license": "MIT",
+  "keywords": [
+    "electron"
+  ],
+  "homepage": "https://github.com/evolvelabs/electron-updater",
   "repository": {
     "type": "git",
     "url": "https://github.com/evolvelabs/electron-updater.git"
   },
-  "keywords": [
-    "electron"
-  ],
-  "author": "Evolve LLC",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/evolvelabs/electron-updater/issues"
   },
-  "homepage": "https://github.com/evolvelabs/electron-updater"
+  "scripts": {
+    "test": "mocha"
+  },
+  "bin": {
+    "electron-updater": "./bin/cli",
+    "elup": "./bin/cli"
+  },
+  "dependencies": {
+    "async": "^0.9.0",
+    "npm": "2.7.0",
+    "semver": "^4.3.3"
+  },
+  "devDependencies": {
+    "commander": "^2.8.1"
+  }
 }

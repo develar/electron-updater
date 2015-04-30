@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+var ElectronUpdater = require('../index.js')
+	program = require('commander')
+	util = require('util')
+
+var help = true
+var updater = new ElectronUpdater()
+program.version('1.0.0')
+program
+	.command('check')
+	.description('Check for updates and dependencies with updates.')
+	.action(function() {
+		help = false
+		updater.check(function (err, deps) {
+			if(err) return console.log('error: ' + util.inspect(err))
+			console.log('found: ')
+			console.log(util.inspect(deps))
+		})
+	})
+
+program
+	.command('watch')
+	.description('Watch for updates on an interval.')
+	.action(function () {
+		help = false
+		updater.watch()
+	})
+
+program
+	.command('update')
+	.description('Update all dependencies right now.')
+	.action(function () {
+		help = false
+		updater.update()
+	})
+
+program
+	.command('list')
+	.description('List all current dependencies and their versions')
+	.action(function () {
+		help = false
+		updater.list(function (err, deps) {
+			if(err) return console.log('' + err)
+			console.log(util.inspect(deps))
+		})
+	})
+
+program.parse(process.argv)
+if(help) {
+	program.help()
+	process.exit(1)
+}
