@@ -1,0 +1,22 @@
+{
+  "name": "electron-updater",
+  "version": "1.0.0",
+  "description": "Cross platform auto-updater for electron applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evolvelabs/electron-updater.git"
+  },
+  "keywords": [
+    "electron"
+  ],
+  "author": "Evolve LLC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evolvelabs/electron-updater/issues"
+  },
+  "homepage": "https://github.com/evolvelabs/electron-updater"
+}
