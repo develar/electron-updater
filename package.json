@@ -30,5 +30,8 @@
   },
   "devDependencies": {
     "commander": "^2.8.1"
-  }
+  },
+  "plugins": [
+    "paktc"
+  ]
 }

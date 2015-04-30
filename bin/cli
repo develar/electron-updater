@@ -11,10 +11,14 @@ program
 	.description('Check for updates and dependencies with updates.')
 	.action(function() {
 		help = false
-		updater.check(function (err, deps) {
+		console.log('checking...')
+		updater.check(function (err, found) {
 			if(err) return console.log('error: ' + util.inspect(err))
-			console.log('found: ')
-			console.log(util.inspect(deps))
+			if(!found) {
+				console.log('no updates found.');
+			} else {
+				console.log('found: ' + util.inspect(found))
+			}
 		})
 	})
 
