@@ -1,3 +1,7 @@
+#directories
 node_modules
 plugins
 .settings
+
+#files
+*.tgz
