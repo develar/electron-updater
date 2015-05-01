@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-var updater = require('../index.js')
-	program = require('commander')
+var updater = require('../index.js'),
+	program = require('commander'),
 	util = require('util')
 
 var help = true
