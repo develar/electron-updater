@@ -34,7 +34,10 @@ program
 	.description('Update all dependencies right now.')
 	.action(function () {
 		help = false
-		updater.update()
+		updater.update(function (err) {
+			if(err) return console.log('' + util.inspect(err))			
+			console.log('updated!')		
+		})
 	})
 
 program
