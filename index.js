@@ -7,6 +7,8 @@ var util = require('util'),
 	updater = require('./lib/update.js'),
 	context = require('./lib/context.js'),
 	exists = require('./lib/exists.js'),
+	executor = require('./lib/executor.js'),
+	copier = require('./lib/copier.js'),
 	EventEmitter = require('events').EventEmitter
 
 function ElectronUpdater() {
@@ -68,63 +70,69 @@ function isValid(callback) {
 		exists.check,
 		function (err, results) {
 			if(err) return callback(err)
-			var r1 = !!results[0]
-			var r2 = !!results[1]
+			var r1 = results[0]
+			var r2 = results[1]
 			callback(null, r1 && r2)
 		})
 	})
 }
 
+function fullUpdate(callback) {
+	copier.copy(process.execPath, function (err, tmpExecPath) {
+		// todo: log error
+		var updateDir = __dirname
+		executor.exec(tmpExecPath, [updateDir, '--electron-update', process.cwd()], callback)
+	})
+}
+
 function start() {
-
-	console.log('starting!')
 	var that = this
-	var i = process.argv.indexOf('--electron-update')
-	var updating = i > 0
-	if(updating) {
-		var tmpDir = path.dirname(process.execPath)
-		var appDir = process.argv[i + 1]
-		if (tmpDir === appDir) {
-			throw new Error('Updater cannot update itself')
+	context.load(function (err, ctx) {
+		// todo: handle error
+		if(ctx.pendingUpdate) {
+			// If there is a pending update, do a full update instead of starting the app.
+			// This is set when a dependency update is available.
+			console.log('pending update.')
+			fullUpdate(function (err) {
+				that.emit('updateRequired')
+			})
+		} else {
+			isValid(function (err, valid) {
+				// todo: handle error
+				if(valid) {
+					// If the app is valid, then go ahead and startup what we have.
+					// After that, we will check for updates and notify user when they are available.
+					that.emit('ready')
+
+					// todo: watch not check
+					check(function (err, result) {
+						//todo: handle error
+						if(result && result.dependencies) {
+							// If a dependency update is available, we must 
+							// restart and do the full update process to update those.
+							var pendingUpdatePath = path.join(directory.appData(), ctx.name, '.update')
+							file.touch(pendingUpdatePath, function (err) {
+								that.emit('updateAvailable')
+							})
+						} else if (result && result.plugins) {
+							// If only plugin updates are available we can go ahead and update those
+							// right now and then notify the user that they can restart to apply them.
+							updater.update(results, function (err) {
+								// todo: log errors
+								this.emit('updateAvailable')
+							})
+						}
+					})
+				} else {
+					console.log('mandatory update.')
+					// todo: log error
+					fullUpdate(function (err) {
+						that.emit('updateRequired')
+					})
+				}
+			})
 		}
-
-		process.cwd(appDir)
-		//process.versions.electron [0.25.1]
-		//process.arch     			[ia32]
-		//process.platform 			[win32]
-		//process.argv				[path/to/electron.exe,arg1,arg2,...]
-		//process.execPath			[path/to/electron.exe]
-		//process.cwd()				[current working dir]
-
-		// todo: show updating splash screen
-		update(function (err) {
-			// log errors...
-			// todo: restart app
-		})
-	} else {
-		isValid(function (err, valid) {
-			// todo: log error
-			if(valid) {
-				that.emit('ready')
-				check(function (err, result) {
-					//todo: log error
-					if(result && result.dependencies) {
-						that.emit('updateAvailable')
-					} else if (result && result.plugins) {
-						update(function (err) {
-							// todo: log errors
-							this.emit('updateAvailable')
-						})
-					}
-				})
-			} else {
-				console.log('mandatory update...')
-				// todo: Update is mandatory
-				//   - copy to temp dir
-				//   - run app from temp dir, passing `--electron-update ${process.pwd()}`
-			}
-		})
-	}
+	})
 }
 
 util.inherits(ElectronUpdater, EventEmitter)
