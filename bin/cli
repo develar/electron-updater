@@ -51,6 +51,19 @@ program
 		})
 	})
 
+program
+	.command('isvalid')
+	.alias('isValid')
+	.alias('valid')
+	.description('Determines if all dependencies and plugins are already installed and satisfy the version requirements')
+	.action(function () {
+		help = false
+		updater.isValid(function (err, valid) {
+			if(err) return console.log('' + err)
+			console.log(valid)
+		})
+	})
+
 program.parse(process.argv)
 if(help) {
 	program.help()
