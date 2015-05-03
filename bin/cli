@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var updater = require('../index.js'),
+var commands = require('../lib/commands.js'),
 	program = require('commander'),
 	util = require('util')
 
@@ -11,7 +11,7 @@ program
 	.action(function() {
 		help = false
 		console.log('checking...')
-		updater.check(function (err, found) {
+		commands.check(function (err, found) {
 			if(err) return console.log('error: ' + util.inspect(err))
 			if(!found) {
 				console.log('no updates found.');
@@ -26,7 +26,7 @@ program
 	.description('Watch for updates on an interval.')
 	.action(function () {
 		help = false
-		updater.watch()
+		commands.watch()
 	})
 
 program
@@ -34,7 +34,7 @@ program
 	.description('Update all dependencies right now.')
 	.action(function () {
 		help = false
-		updater.update(function (err) {
+		commands.update(function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')		
 		})
@@ -45,7 +45,7 @@ program
 	.description('List all current dependencies and their versions')
 	.action(function () {
 		help = false
-		updater.list(function (err, deps) {
+		commands.list(function (err, deps) {
 			if(err) return console.log('' + err)
 			console.log(util.inspect(deps))
 		})
@@ -58,7 +58,7 @@ program
 	.description('Determines if all dependencies and plugins are already installed and satisfy the version requirements')
 	.action(function () {
 		help = false
-		updater.isValid(function (err, valid) {
+		commands.isValid(function (err, valid) {
 			if(err) return console.log('' + err)
 			console.log(valid)
 		})
