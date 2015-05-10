@@ -1,7 +1,9 @@
 var commands = require('./lib/commands.js'),
 	directory = require('./lib/directory.js'),
 	fs = require('fs'),
-	spawn = require('child_process').spawn
+	spawn = require('child_process').spawn,
+	BrowserWindow = require('browser-window'),
+	ipc = require('ipc')
 
 console.log('loading electron updater...')
 var i = process.argv.indexOf('--electron-update')
@@ -17,7 +19,17 @@ if (i > 0) {
 	// }
 
 	app.on('ready', function () {
-		// todo: show updater splash...
+
+		var win = new BrowserWindow({ 
+			width: 400,
+			height: 100,
+			frame: false
+		})		
+        win.loadUrl('file://' + __dirname + '/update.html')
+        ipc.on('initialize', function (event, arg) {
+        	event.sender.send('initialize', args)
+        })
+
 		commands.update(function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')

@@ -1,0 +1,37 @@
+body {
+	overflow:hidden;
+	margin: 0px;
+	height: 100px;
+	padding: 10px 0px 10px 0px;
+}
+
+.container {
+	padding: 0px;
+	height: 80px;
+	vertical-align: middle;
+}
+
+#spinner {
+	vertical-align: middle;
+	height: 80px;
+	width: 80px;
+	margin: 0px;
+	float: left;
+}
+
+.messages {
+	float: left;
+	vertical-align: middle;
+	height: 80px;
+}
+
+.messages h1 {
+	white-space: nowrap;
+	font: 24px Helvetica, sans-serif;
+	font-weight: bold;
+	margin: 15px auto 0px 0px;
+}
+
+.messages p {
+	margin: 0px;
+}

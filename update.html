@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Updating...</title>
+    <script src="node_modules/spin/spin.js"></script>
+    <link href="update.css" type="text/css" rel="stylesheet">
+  </head>
+  <body>
+  	<div class="container">
+	    <div id="spinner"></div>
+	    <div class="messages">
+	    	<h1>Updating...</h1>
+	    	<p id="name"></p>
+	    </div>
+  	</div>
+  </body>
+  <script>
+  	var ipc = require('ipc'),
+  		util = require('util')
+  	var spinnerElement = document.getElementById('spinner')
+  	var nameElement = document.getElementById('name')
+  	new Spinner({color:'#000', lines: 12}).spin(spinnerElement)
+  	ipc.on('initialize', function(arg) {
+  		nameElement.innerHTML = arg.appName
+	});
+	ipc.send('initialize')
+  </script>
+</html>
