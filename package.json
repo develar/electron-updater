@@ -24,6 +24,7 @@
     "elup": "./bin/cli"
   },
   "dependencies": {
+    "appdirectory": "^0.1.0",
     "async": "^0.9.0",
     "npm": "2.7.0",
     "semver": "^4.3.3",

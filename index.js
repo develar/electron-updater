@@ -1,9 +1,9 @@
 var commands = require('./lib/commands.js'),
-	directory = require('./lib/directory.js'),
 	fs = require('fs'),
 	spawn = require('child_process').spawn,
 	BrowserWindow = require('browser-window'),
-	ipc = require('ipc')
+	ipc = require('ipc'),
+	AppDirectory = require('appdirectory')
 
 console.log('loading electron updater...')
 var i = process.argv.indexOf('--electron-update')
@@ -33,8 +33,9 @@ if (i > 0) {
 		commands.update(function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')
-			var tmpDir = path.join(directory.appData(), args.appName)
-			var updateFile = path.join(tmpDir, '.update')
+			var dirs = new AppDirectory(args.appName)
+			var appDir = path.dirname(dirs.userData())
+			var updateFile = path.join(appDir, '.update')
 			fs.unlink(updateFile, function () {
 				var execPath = args.argv.shift()
 				var child = spawn(execPath, args.argv, {
