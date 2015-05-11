@@ -21,7 +21,9 @@
   },
   "bin": {
     "electron-updater": "./bin/cli",
-    "elup": "./bin/cli"
+    "elup": "./bin/cli",
+    "link-plugin": "./bin/link-plugin",
+    "lnp": "./bin/link-plugin"
   },
   "dependencies": {
     "appdirectory": "^0.1.0",
@@ -32,6 +34,8 @@
     "tar-stream": "^1.1.4"
   },
   "devDependencies": {
-    "commander": "^2.8.1"
+    "colors": "^1.1.0",
+    "commander": "^2.8.1",
+    "shelljs": "^0.4.0"
   }
 }
