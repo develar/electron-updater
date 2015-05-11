@@ -1,7 +1,6 @@
 var commands = require('./lib/commands.js'),
 	fs = require('fs'),
 	spawn = require('child_process').spawn,
-	BrowserWindow = require('browser-window'),
 	ipc = require('ipc'),
 	AppDirectory = require('appdirectory')
 
