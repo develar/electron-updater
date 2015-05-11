@@ -4,7 +4,6 @@ var commands = require('./lib/commands.js'),
 	ipc = require('ipc'),
 	AppDirectory = require('appdirectory')
 
-console.log('loading electron updater...')
 var i = process.argv.indexOf('--electron-update')
 if (i > 0) {
 	var app = require('app'),
@@ -29,7 +28,7 @@ if (i > 0) {
         	event.sender.send('initialize', args)
         })
 
-		commands.update(function (err) {
+		commands.update(process.cwd(), function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')
 			var dirs = new AppDirectory(args.appName)

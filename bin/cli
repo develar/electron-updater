@@ -6,12 +6,12 @@ var commands = require('../lib/commands.js'),
 var help = true
 program.version('1.0.0')
 program
-	.command('check')
+	.command('check [appdir]')
 	.description('Check for updates and dependencies with updates.')
-	.action(function() {
+	.action(function(appdir) {
 		help = false
 		console.log('checking...')
-		commands.check(function (err, found) {
+		commands.check(appdir || process.cwd(), function (err, found) {
 			if(err) return console.log('error: ' + util.inspect(err))
 			if(!found) {
 				console.log('no updates found.');
@@ -22,43 +22,43 @@ program
 	})
 
 program
-	.command('watch')
+	.command('watch [appdir]')
 	.description('Watch for updates on an interval.')
-	.action(function () {
+	.action(function (appdir) {
 		help = false
-		commands.watch()
+		commands.watch(appdir || process.cwd())
 	})
 
 program
-	.command('update')
+	.command('update [appdir]')
 	.description('Update all dependencies right now.')
-	.action(function () {
+	.action(function (appdir) {
 		help = false
-		commands.update(function (err) {
+		commands.update(appdir || process.cwd(), function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')		
 		})
 	})
 
 program
-	.command('list')
+	.command('list [appdir]')
 	.description('List all current dependencies and their versions')
-	.action(function () {
+	.action(function (appdir) {
 		help = false
-		commands.list(function (err, deps) {
+		commands.list(appdir || process.cwd(), function (err, deps) {
 			if(err) return console.log('' + err)
 			console.log(util.inspect(deps))
 		})
 	})
 
 program
-	.command('isvalid')
+	.command('isvalid [appdir]')
 	.alias('isValid')
 	.alias('valid')
 	.description('Determines if all dependencies and plugins are already installed and satisfy the version requirements')
-	.action(function () {
+	.action(function (appdir) {
 		help = false
-		commands.isValid(function (err, valid) {
+		commands.isValid(appdir || process.cwd(), function (err, valid) {
 			if(err) return console.log('' + err)
 			console.log(valid)
 		})
