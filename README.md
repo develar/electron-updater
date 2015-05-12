@@ -2,7 +2,7 @@
 Cross platform auto-updater for electron apps
 
 # Install
-There are two separate packages that make up the `electron-updater`. The updater itself runs in your app's main process while the plugins project loads the plugins downloaded by the updater into the render process. If you don't use plugin's at all then you don't need the second project.
+There are two separate packages that make up the `electron-updater`. The updater itself runs in your app's main process while the plugins project loads the plugins downloaded by the updater into the render process. If you don't use plugins, then you don't need the second project.
 
     $ npm install electron-updater --save
     $ npm install electron-plugins --save
