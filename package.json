@@ -34,8 +34,12 @@
     "tar-stream": "^1.1.4"
   },
   "devDependencies": {
+    "chai": "^2.3.0",
     "colors": "^1.1.0",
     "commander": "^2.8.1",
-    "shelljs": "^0.4.0"
+    "mocha": "^2.2.4",
+    "proxyquire": "^1.4.0",
+    "shelljs": "^0.4.0",
+    "sinon": "^1.14.1"
   }
 }
