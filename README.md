@@ -27,8 +27,7 @@ var app = require('app'),
   
 require('crash-reporter').start()
 
-var mainWindow = null, 
-    loaded = false
+var mainWindow = null
 
 app.on('window-all-closed', function() {
     if (process.platform != 'darwin')
