@@ -17,8 +17,8 @@ There are two separate packages that make up the `electron-updater`. The updater
  * Fully based on javascript and node
  * Designed for [`electron`](https://github.com/atom/electron)
  
-## Example `main.js`
-```
+## Example main.js
+```JavaScript
 var app = require('app'),
     ipc = require('ipc'),
     util = require('util'),
@@ -81,7 +81,7 @@ app.on('ready', function() {
 ```
 
 ## Example index.js (running in render process)
-```
+```JavaScript
 var plugins = require('electron-plugins'),
 	util = require('util'),
 	ipc = require('ipc')
