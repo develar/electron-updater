@@ -17,7 +17,9 @@ describe('commands', function () {
     _context = {
       load: sinon.stub()
     }
-    _check = {}
+    _check = {
+      check: sinon.stub()
+    }
     _update = {}
     _exists = {
       check: sinon.stub()
@@ -39,6 +41,8 @@ describe('commands', function () {
       plugins: {}
     }
     _context.load.callsArgWith(1, null, _ctx)
+    _check.check.callsArgWith(1, null, [])
+    _check.check.onFirstCall().callsArgWith(1, null)
   })
 
   describe('isValid', function () {
@@ -105,8 +109,6 @@ describe('commands', function () {
   })
 
   describe('list', function () {
-    beforeEach(function () {
-    })
     it('should default to main modules dir if not specified', function (done) {
       commands.list(function (err, result) {
         expect(_context.load.calledWith(path.dirname(process.mainModule.filename))).to.be.true
@@ -146,7 +148,65 @@ describe('commands', function () {
   })
 
   describe('check', function () {
-
+    beforeEach(function () {
+    })
+    it('should default to main modules dir if not specified', function (done) {
+      commands.check(function (err, result) {
+        expect(_context.load.calledWith(path.dirname(process.mainModule.filename))).to.be.true
+        done(err)
+      })
+    })
+    it('should load context from appdir', function (done) {
+      commands.check('/test', function (err, result) {
+        expect(_context.load.calledWith('/test')).to.be.true
+        done(err)
+      })
+    })
+    it('should check app', function (done) {
+      commands.check(function (err) {
+        expect(_check.check.calledWith({context: _ctx, kind: 'app' })).to.be.true
+        done(err)
+      })
+    })
+    it('should check dependencies', function (done) {
+      commands.check(function (err) {
+        expect(_check.check.calledWith({context: _ctx, kind: 'dependencies' })).to.be.true
+        done(err)
+      })
+    })
+    it('should check plugins', function (done) {
+      commands.check(function (err) {
+        expect(_check.check.calledWith({context: _ctx, kind: 'plugins' })).to.be.true
+        done(err)
+      })
+    })
+    it('should return null if no updates are available', function (done) {
+      commands.check(function (err, results) {
+        expect(results).to.be.undefined
+        done(err)
+      })
+    })
+    it('should return app if app updates are available', function (done) {
+      _check.check.onFirstCall().callsArgWith(1, null, {})  
+      commands.check(function (err, results) {
+        expect(results).to.deep.equal({app:{}, context: _ctx, dependencies: [], plugins: []})
+        done(err)
+      })
+    })
+    it('should return dependencies if dependency updates are available', function (done) {
+      _check.check.onSecondCall().callsArgWith(1, null, [true])  
+      commands.check(function (err, results) {
+        expect(results).to.deep.equal({app:undefined, context: _ctx, dependencies: [true], plugins: []})
+        done(err)
+      })
+    })
+    it('should return plugins if plugin updates are available', function (done) {
+      _check.check.onThirdCall().callsArgWith(1, null, [true])  
+      commands.check(function (err, results) {
+        expect(results).to.deep.equal({app:undefined, context: _ctx, dependencies: [], plugins: [true]})
+        done(err)
+      })
+    })
   })
 
   describe('update', function () {
