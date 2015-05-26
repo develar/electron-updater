@@ -32,7 +32,12 @@ describe('commands', function () {
     }
     commands = proxyquire('../lib/commands.js', _mocks)
 
-    _ctx = {}
+    _ctx = {
+      name: 'test',
+      version: '1.0.0',
+      dependencies: {},
+      plugins: {}
+    }
     _context.load.callsArgWith(1, null, _ctx)
   })
 
@@ -100,7 +105,44 @@ describe('commands', function () {
   })
 
   describe('list', function () {
-
+    beforeEach(function () {
+    })
+    it('should default to main modules dir if not specified', function (done) {
+      commands.list(function (err, result) {
+        expect(_context.load.calledWith(path.dirname(process.mainModule.filename))).to.be.true
+        done(err)
+      })
+    })
+    it('should load context from appdir', function (done) {
+      commands.list('/test', function (err, result) {
+        expect(_context.load.calledWith('/test')).to.be.true
+        done(err)
+      })
+    })
+    it('should return app name', function (done) {
+      commands.list(function (err, result) {
+        expect(result.name).to.equal('test')
+        done(err)
+      })
+    })
+    it('should return app version', function (done) {
+      commands.list(function (err, result) {
+        expect(result.version).to.equal('1.0.0')
+        done(err)
+      })
+    })
+    it('should return dependencies', function (done) {
+      commands.list(function (err, result) {
+        expect(result.dependencies).to.equal(_ctx.dependencies)
+        done(err)
+      })
+    })
+    it('should return plugins', function (done) {
+      commands.list(function (err, result) {
+        expect(result.plugins).to.equal(_ctx.plugins)
+        done(err)
+      })
+    })
   })
 
   describe('check', function () {
