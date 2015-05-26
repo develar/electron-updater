@@ -58,16 +58,38 @@ describe('update', function () {
     _directory.remove.callsArgWith(1, null)
   })
 
-  it('should update dependencies')
-  it('should update dependencies recursively')
-  it('should update plugins')
-
   describe('app', function () {    
-    describe('in dev environment', function () {
-        it('should not update the app')
+    describe('update available', function () {
+        beforeEach(function () {
+            _deps.app = { name: 'test', available: '1.0.1' }
+        })
+        describe('in dev environment', function () {
+            beforeEach(function () {
+                _deps.context.dev = true
+            })
+            it('should not update the app', function (done) {
+                update.update(_deps, function (err) {
+                    expect(_download.getJson.called).to.be.false
+                    done(err)
+                })
+            })
+        })
+        it('should update the app', function (done) {
+            update.update(_deps, function (err) {
+                expect(_download.get.called).to.be.true
+                expect(_unpack.extract.called).to.be.true
+                done(err)
+            })
+        })
     })
-    it('should not update the app if its not out of date')
-    it('should update the app')
+    describe('update not available', function () {
+        it('should not update the app if its not out of date', function (done) {
+            update.update(_deps, function (err) {
+                expect(_download.getJson.called).to.be.false
+                done(err)
+            })        
+        })        
+    })
   })
 
   describe('dependencies', function () {
@@ -87,7 +109,7 @@ describe('update', function () {
     })
     it('should update dependencies', function (done) {
         update.update(_deps, function (err) {
-            expect(_download.getJson.called).to.be.true
+            expect(_download.get.called).to.be.true
             expect(_unpack.extract.called).to.be.true
             done(err)
         })        
@@ -99,7 +121,7 @@ describe('update', function () {
         })
         it('should update sub dependencies', function (done) {            
             update.update(_deps, function (err) {
-                expect(_download.getJson.calledTwice).to.be.true
+                expect(_download.get.calledTwice).to.be.true
                 expect(_unpack.extract.calledTwice).to.be.true
                 done(err)
             })
@@ -114,7 +136,7 @@ describe('update', function () {
     describe('in dev environment', function () {
         it('should update plugins', function (done) {
             update.update(_deps, function (err) {
-                expect(_download.getJson.called).to.be.true
+                expect(_download.get.called).to.be.true
                 expect(_unpack.extract.called).to.be.true
                 done(err)
             })
@@ -127,7 +149,7 @@ describe('update', function () {
         })
         it('should update sub dependencies', function (done) {            
             update.update(_deps, function (err) {
-                expect(_download.getJson.calledTwice).to.be.true
+                expect(_download.get.calledTwice).to.be.true
                 expect(_unpack.extract.calledTwice).to.be.true
                 done(err)
             })
@@ -136,7 +158,7 @@ describe('update', function () {
 
     it('should update plugins', function (done) {
         update.update(_deps, function (err) {
-            expect(_download.getJson.called).to.be.true
+            expect(_download.get.called).to.be.true
             expect(_unpack.extract.called).to.be.true
             done(err)
         })
