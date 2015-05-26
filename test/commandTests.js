@@ -20,7 +20,9 @@ describe('commands', function () {
     _check = {
       check: sinon.stub()
     }
-    _update = {}
+    _update = {
+      update: sinon.stub()
+    }
     _exists = {
       check: sinon.stub()
     }
@@ -43,6 +45,7 @@ describe('commands', function () {
     _context.load.callsArgWith(1, null, _ctx)
     _check.check.callsArgWith(1, null, [])
     _check.check.onFirstCall().callsArgWith(1, null)
+    _update.update.callsArg(1)
   })
 
   describe('isValid', function () {
@@ -148,8 +151,6 @@ describe('commands', function () {
   })
 
   describe('check', function () {
-    beforeEach(function () {
-    })
     it('should default to main modules dir if not specified', function (done) {
       commands.check(function (err, result) {
         expect(_context.load.calledWith(path.dirname(process.mainModule.filename))).to.be.true
@@ -210,7 +211,23 @@ describe('commands', function () {
   })
 
   describe('update', function () {
-
+    describe('when there are no updates', function () {
+      it('should not update', function (done) {
+        commands.update(function (err) {
+          expect(_update.update.called).to.be.false
+          done(err)
+        })
+      })
+    })
+    describe('when there are updates', function () {
+      it('should update', function (done) {
+        _check.check.onFirstCall().callsArgWith(1, null, {})
+        commands.update(function (err) {
+          expect(_update.update.called).to.be.true
+          done(err)
+        })
+      })
+    })
   })
 
   describe('start', function () {
