@@ -196,6 +196,10 @@ describe('checking', function () {
         _file.readJson
           .callsArgWith(1, null, {'test-plugin': '1.0.0'})
         _fs.stat
+          .onFirstCall()
+          .callsArgWith(1, 'ENOENT')
+        _fs.stat
+          .onSecondCall()
           .callsArgWith(1, null)
         _download.getJson
           .withArgs('http://npm.test.com/test-plugin/^1.0.0')
@@ -208,12 +212,29 @@ describe('checking', function () {
           done()
         })
       })
+      describe('when the plugin is linked', function () {
+        beforeEach(function () {
+          _fs.stat
+            .onFirstCall()
+            .callsArgWith(1, null)
+        })
+        it('should return false', function (done) {
+          checker.check(_item, function (err, result) {
+            if(err) return done(err)
+            expect(result[0]).to.be.undefined
+            done()
+          })
+        })
+      })
     })
 
     describe('when a new version is not available', function () {
       beforeEach(function () {
         _file.readJson
           .callsArgWith(1, null, {'test-plugin': '1.0.0'})
+        _fs.stat
+          .onFirstCall()
+          .callsArgWith(1, 'ENOENT')
         _fs.stat
           .callsArgWith(1, null)
         _download.getJson
