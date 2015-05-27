@@ -11,7 +11,10 @@ describe('commands', function () {
     _update,
     _exists,
     _copier,
-    _ctx
+    _ctx,
+    _child_process,
+    _child,
+    _file
 
   beforeEach(function () {
     _context = {
@@ -26,13 +29,26 @@ describe('commands', function () {
     _exists = {
       check: sinon.stub()
     }
-    _copier = {}
+    _copier = {
+      copy: sinon.stub()
+    },
+    _child_process = {
+      spawn: sinon.stub()
+    }
+    _child = {
+      unref: sinon.stub()
+    }
+    _file = {
+      touch: sinon.stub()
+    }
     _mocks = {
       './context.js': _context,
       './check.js': _check,
       './update.js': _update,
       './exists.js': _exists,
-      './copier.js': _copier
+      './copier.js': _copier,
+      './file.js': _file,
+      'child_process': _child_process
     }
     commands = proxyquire('../lib/commands.js', _mocks)
 
@@ -46,6 +62,9 @@ describe('commands', function () {
     _check.check.callsArgWith(1, null, [])
     _check.check.onFirstCall().callsArgWith(1, null)
     _update.update.callsArg(1)
+    _copier.copy.callsArgWith(2, null, '/tmp/app')
+    _child_process.spawn.returns(_child)
+    _file.touch.callsArg(1)
   })
 
   describe('isValid', function () {
@@ -231,7 +250,122 @@ describe('commands', function () {
   })
 
   describe('start', function () {
+    var _ready,
+      _updateAvailable,
+      _updateRequired
 
+    beforeEach(function () {
+      _exists.check.callsArgWith(1, null, false)
+      commands.on('ready', (_ready = sinon.stub()))
+      commands.on('updateAvailable', (_updateAvailable = sinon.stub()))
+      commands.on('updateRequired', (_updateRequired = sinon.stub()))
+    })
+    it('should default to main module dir', function (done) {
+      commands.start(function (err) {
+        expect(_context.load.calledWith(path.dirname(process.mainModule.filename))).to.be.true
+        done(err)
+      })
+    })
+    it('should use appdir if supplied', function (done) {
+      commands.start('/appdir', function (err) {
+        expect(_context.load.calledWith('/appdir')).to.be.true
+        done(err)
+      })
+    })
+    it('should do full update if there is a pending update', function (done) {
+      _ctx.pendingUpdate = true
+      commands.start(function (err) {
+        expect(_child_process.spawn.called).to.be.true
+        done(err)
+      })
+    })
+    describe('when valid', function () {
+      beforeEach(function () {
+        _exists.check.callsArgWith(1, null, true)
+      })
+      it('should emit the ready event', function (done) {
+        commands.start(function (err) {
+          expect(_ready.called).to.be.true
+          done(err)
+        })
+      })
+      it('should touch .update file if app has an udpate available', function (done) {
+        _check.check.onFirstCall().callsArgWith(1, null, {})
+        commands.start(function (err) {
+          expect(_file.touch.called).to.be.true
+          done(err)
+        })
+      })
+      it('should touch .update file if a dependency has an udpate available', function (done) {
+        _check.check.onSecondCall().callsArgWith(1, null, [true])
+        commands.start(function (err) {
+          expect(_file.touch.called).to.be.true
+          done(err)
+        })
+      })
+      it('should emit update available if app has a update available', function (done) {
+        _check.check.onFirstCall().callsArgWith(1, null, {})
+        commands.start(function (err) {
+          expect(_updateAvailable.called).to.be.true
+          done(err)
+        })
+      })
+      it('should emit update available if a dependency has a update available', function (done) {
+        _check.check.onSecondCall().callsArgWith(1, null, [true])
+        commands.start(function (err) {
+          expect(_updateAvailable.called).to.be.true
+          done(err)
+        })
+      })
+      it('should do update if plugins have update available', function (done) {
+        _check.check.onThirdCall().callsArgWith(1, null, [true])
+        commands.start(function (err) {
+          expect(_update.update.called).to.be.true
+          done(err)
+        })
+      })
+      it('should emit update available if it updates plugins', function (done) {
+        _check.check.onThirdCall().callsArgWith(1, null, [true])
+        commands.start(function (err) {
+          expect(_updateAvailable.called).to.be.true
+          done(err)
+        })
+      })
+    })
+    describe('when not valid', function () {
+      beforeEach(function () {
+
+      })
+      it('should copy the app', function (done) {
+        commands.start(function (err) {
+          expect(_copier.copy.called).to.be.true
+          done(err)
+        })
+      })
+      it('should spawn the copied app', function (done) {
+        commands.start(function (err) {          
+          expect(_child_process.spawn.calledWith('/tmp/app')).to.be.true
+          done(err)
+        })
+      })
+      it('should pass the arg --electron-update when spawning', function (done) {
+        commands.start(function (err) {
+          expect(_child_process.spawn.calledWith(sinon.match.string, [sinon.match.string, '--electron-update', sinon.match.string])).to.be.true
+          done(err)
+        })
+      })
+      it('should unref the child process', function (done) {
+        commands.start(function (err) {
+          expect(_child.unref.called).to.be.true
+          done(err)
+        })
+      })
+      it('should emit the udpateRequired event', function (done) {
+        commands.start(function (err) {
+          expect(_updateRequired.called).to.be.true
+          done(err)
+        })
+      })
+    })
   })
-
 })
