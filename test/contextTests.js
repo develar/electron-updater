@@ -31,7 +31,7 @@ describe('context', function () {
       _fs.readdir
         .callsArgWith(1, 'ENOENT')
       _fs.readFile
-        .callsArgWith(1, 'ENOENT')
+        .callsArgWith(2, 'ENOENT')
       _fs.stat
         .callsArgWith(1, 'ENOENT')
       _file.readJson
@@ -56,7 +56,7 @@ describe('context', function () {
     describe('channel', function () {
       describe('when .channel is available', function () {
         it('should set the channel to file contents', function (done) {
-          _fs.readFile.callsArgWith(1, null, 'beta')
+          _fs.readFile.onSecondCall().callsArgWith(2, null, 'beta')
           context.load('/test', function (err, context) {
             if(err) return done(err)
             expect(context.channel).to.equal('beta')
@@ -161,6 +161,12 @@ describe('context', function () {
         done()
       })
     })    
-    it('should resolve the registry from .npmrc settings')
+    it('should resolve the registry from .npmrc settings', function (done) {
+      _fs.readFile.onFirstCall().callsArgWith(2, null, 'registry=http://private.registry.com')
+      context.load('/test', function (err, context) {
+        expect(context.registry).to.equal('http://private.registry.com')
+        done(err)
+      })
+    })
   })
 })
