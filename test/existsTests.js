@@ -32,6 +32,7 @@ describe('exists', function () {
       }
     }
     exists = proxyquire('../lib/exists.js', _mocks)
+    _fs.stat.callsArgWith(1, 'ENOENT')
   })
 
   describe('dependencies', function () {
@@ -115,7 +116,14 @@ describe('exists', function () {
     describe('actually exist', function () {
       beforeEach(function () {
         _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0'})
-        _fs.stat.callsArgWith(1, null, {})
+        _fs.stat.onSecondCall().callsArgWith(1, null, {})
+      })
+      it('should return truen when the plugin is linked', function (done) {
+        _fs.stat.onFirstCall().callsArgWith(1, null, {})
+        exists.check(_item, function (err, result) {
+          expect(result).to.be.true
+          done(err)
+        })
       })
       it('should return true when single plugin exists', function (done) {
         exists.check(_item, function (err, result) {
@@ -124,8 +132,9 @@ describe('exists', function () {
         })
       })
       it('should return true when all plugins exist', function (done) {
-        _item.context.plugins['test2-plugin'] = '^1.0.0'        
+        _item.context.plugins['test2-plugin'] = '^1.0.0'
         _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0', 'test2-plugin': '1.0.0' })
+        _fs.stat.onCall(3).callsArgWith(1, null, {})
         exists.check(_item, function (err, result) {
           expect(result).to.be.true
           done()
@@ -151,7 +160,13 @@ describe('exists', function () {
     describe('actually missing', function () {
       beforeEach(function () {
         _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0'})
-        _fs.stat.callsArgWith(1, {})
+      })
+      it('should return truen when the plugin is linked', function (done) {
+        _fs.stat.onFirstCall().callsArgWith(1, null, {})
+        exists.check(_item, function (err, result) {
+          expect(result).to.be.true
+          done(err)
+        })
       })
       it('should return false when single plugin is missing', function (done) {
         exists.check(_item, function (err, result) {
@@ -161,8 +176,7 @@ describe('exists', function () {
         })
       })
       it('should return false when one of many plugins is missing', function (done) {
-        _fs.stat.onFirstCall().callsArgWith(1, null, {})
-        _fs.stat.onSecondCall().callsArgWith(1, {})
+        _fs.stat.onSecondCall().callsArgWith(1, null, {})
         _item.context.plugins['test2-plugin'] = '^1.0.0'
         _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0', 'test2-plugin': '1.0.0' })
         exists.check(_item, function (err, result) {

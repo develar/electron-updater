@@ -30,6 +30,10 @@ if (!valid) {
     process.exit(1);
 }
 
+function updateCurrent(appData, name, version) {
+
+}
+
 function linkPlugin(appName, callback) {
     fs.readFile('package.json', {encoding: 'utf8'}, function (err, data) {
         if(err) echo('[' + 'error'.red + '] package.json not found in current working directory') && process.exit(1)
