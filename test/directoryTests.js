@@ -83,6 +83,14 @@ describe('directory', function () {
         })
     })
 
+    it('it succeeds even if path already exists', function (done) {
+        _fs.mkdir.callsArgWith(1, {code: 'EEXIST'})
+        directory.create('/a/b/c/d', function (err) {
+            expect(err).to.be.undefined
+            done()
+        })
+    })
+
     it('creates a relative directory', function (done) {
         _fs.mkdir.withArgs('a').callsArg(1);
         directory.create('a', function (err) {
