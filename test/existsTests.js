@@ -195,5 +195,25 @@ describe('exists', function () {
         })
       })
     })
+
+    describe('is linked', function () {
+      beforeEach(function () {
+        _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0'})
+        _fs.stat.onFirstCall().callsArgWith(1, null, {version: '1.0.0'})
+      })
+      it('should return true when plugin is linked', function (done) {
+        exists.check(_item, function (err, result) {
+          expect(result).to.be.true
+          done(err)
+        })
+      })
+      it('should return true when plugin is linked and downloaded', function (done) {
+        _fs.stat.onSecondCall().callsArgWith(1, null, {version: '1.0.0'})
+        exists.check(_item, function (err, result) {
+          expect(result).to.be.true
+          done(err)
+        })
+      })
+    })
   })
 })
