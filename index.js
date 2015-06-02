@@ -1,4 +1,5 @@
 var commands = require('./lib/commands.js'),
+	util = require('util'),
 	fs = require('fs'),
 	spawn = require('child_process').spawn,
 	ipc = require('ipc'),
@@ -22,15 +23,20 @@ if (i > 0) {
 			width: 400,
 			height: 100,
 			frame: false
-		})		
-        win.loadUrl('file://' + __dirname + '/update.html')
-        ipc.on('initialize', function (event, arg) {
-        	event.sender.send('initialize', args)
-        })
+		})
+    win.loadUrl('file://' + __dirname + '/update.html')
+    ipc.on('initialize', function (event, arg) {
+    	event.sender.send('initialize', args)
+    })
+
+    var _log = console.log
+    console.log = function (line) {
+    	_log(line)
+    	fs.appendFile('update.log', line + '\n')
+    }
 
 		commands.update(process.cwd(), function (err) {
-			if(err) return console.log('' + util.inspect(err))			
-			console.log('updated!')
+			if(err) return console.log(err)
 			var dirs = new AppDirectory(args.appName)
 			var appDir = path.dirname(dirs.userData())
 			var updateFile = path.join(appDir, '.update')
