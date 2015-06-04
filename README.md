@@ -8,11 +8,18 @@ There are two separate packages that make up the `electron-updater`. The updater
 
     $ npm install electron-updater --save
     $ npm install electron-plugins --save
+    
+### Related
+See the [`electron-builder`](https://www.npmjs.com/package/electron-builder) project for creating installers for
+various platforms.
+
+See the [`sinopia`](https://www.npmjs.com/package/sinopia) project for hosting your own npm packages.
 
 ## Features
+ * Cross platform (win32, darwin, linux)
  * Update notifications
  * Update electron binaries in place
- * Update application
+ * Update your application and dependencies in place
  * Download prebuilt binaries per-platform
  * Side-by-Side update of plugins
  * Leverages npm for distribution
