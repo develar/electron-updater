@@ -292,14 +292,14 @@ describe('command,', function () {
       it('should touch .update file if app has an udpate available', function (done) {
         _check.check.onFirstCall().callsArgWith(1, null, {})
         commands.start(function (err) {
-          expect(_file.touch.called).to.be.true
+          expect(_file.touch.withArgs(sinon.match.string, 'PENDING').called).to.be.true
           done(err)
         })
       })
       it('should touch .update file if a dependency has an udpate available', function (done) {
         _check.check.onSecondCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
-          expect(_file.touch.called).to.be.true
+          expect(_file.touch.withArgs(sinon.match.string, 'PENDING').called).to.be.true
           done(err)
         })
       })
