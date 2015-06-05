@@ -8,10 +8,20 @@ var commands = require('./lib/commands.js'),
 	directory = require('./lib/directory.js'),
 	file = require('./lib/file.js')
 
-var argv = minimist(process.argv.slice(2))
+function _launch(args) {
+	console.log('relaunching app.')
+	var child = spawn(args.exe, args.argv, {
+		detached: true,
+		cwd: args.cwd,
+		stdio: [ 'ignore', 'pipe', 'pipe'] // out, err]
+	});
+	child.unref();
+}
 
+var argv = minimist(process.argv.slice(2))
 if (argv['electron-update']) {
 
+	var relaunch = typeof argv.relaunch === 'boolean' ? argv.relaunch : true
 	var encodedArgs = argv['electron-update']
 	var decodedArgs = new Buffer(encodedArgs, 'base64').toString('ascii')
 	var args = JSON.parse(decodedArgs)
@@ -32,6 +42,8 @@ if (argv['electron-update']) {
 	}
 
 	console.log('updating...')
+	console.log('args: ' + util.inspect(argv))
+	console.log('relaunch: ' + relaunch)
 
 	// Flag an update as pending
 	file.touch(pendingUpdatePath, 'INPROGRESS', function (err) {
@@ -57,8 +69,14 @@ if (argv['electron-update']) {
 				// with the right permissions.
 				if(err.code === 'EPERM') {
 					console.log('No permission to update, elevating...')
+
+					var elevatedArgs = process.argv.slice(1)
+
+					// Tell the elevated process not to relaunch, we will relaunch from this process when its done.
+					elevatedArgs.push('--no-relaunch')
+
 					// relaunch self as an elevated process
-					launch.elevate(args.appName, process.execPath, process.argv.slice(1), process.cwd(), function (err) {
+					launch.elevate(args.appName, process.execPath, elevatedArgs, process.cwd(), function (err) {
 						if(err) return console.log(err)
 						// Watch for changes to the .update file, it will become empty when the update succeeds.
 						fs.watchFile(pendingUpdatePath, {persistent: true, interval:500}, function () {
@@ -67,12 +85,10 @@ if (argv['electron-update']) {
 								if(contents === '') {
 									// When update is done the file will be changed to have empty content
 									fs.unwatchFile(pendingUpdatePath)
-									var child = spawn(args.exe, args.argv, {
-										detached: true,
-										cwd: args.cwd,
-										stdio: [ 'ignore', 'pipe', 'pipe'] // out, err]
-									});
-									child.unref();
+									if (relaunch) {
+										console.log('relaunching from unelevated process.')
+										_launch(args)
+									}
 									app.quit()
 								} else if(contents === 'PENDING') {
 									// Going back to a PENDING state means that the elevated process
@@ -85,6 +101,7 @@ if (argv['electron-update']) {
 						})
 					})
 				} else {
+					console.log('update failed for an unexected reason.')
 					console.log(err)
 					file.touch(pendingUpdatePath, 'PENDING', function () {
 						app.quit()
@@ -92,8 +109,16 @@ if (argv['electron-update']) {
 				}
 			} else {
 				// Update was successful!
+				console.log('updated succeeded!')
 				file.touch(pendingUpdatePath, '', function (err) {
 					if(err) console.log(err)
+
+					// If the app was already running as admin, this flag will be missing. Go ahead and re-launch the app.
+					if(relaunch) {
+						console.log('relaunching app.')
+						_launch(args)
+					}
+
 					app.quit()
 				})
 			}
