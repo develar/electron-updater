@@ -3,22 +3,17 @@ var commands = require('./lib/commands.js'),
 	fs = require('fs'),
 	spawn = require('child_process').spawn,
 	ipc = require('ipc'),
-	AppDirectory = require('appdirectory')
+	minimist = require('minimist'),
+	launch = require('./lib/launch.js'),
+	directory = require('./lib/directory.js'),
+	file = require('./lib/file.js')
 
-var i = process.argv.indexOf('--electron-update')
-if (i > 0) {
-	var app = require('app'),
-		BrowserWindow = require('browser-window')
+var argv = minimist(process.argv.slice(2))
 
-	var args = JSON.parse(process.argv[i + 1])
-	// {
-	//	name: appName,
-	// 	cwd: process.cwd(),
-	// 	argv: process.argv
-	// }
-
+function update(callback) {
+	var app = require('app')
+	var BrowserWindow = require('browser-window')
 	app.on('ready', function () {
-
 		var win = new BrowserWindow({ 
 			width: 400,
 			height: 100,
@@ -29,29 +24,83 @@ if (i > 0) {
     	event.sender.send('initialize', args)
     })
 
-    var _log = console.log
-    console.log = function (line) {
-    	_log(line)
-    	fs.appendFile('update.log', line + '\n')
-    }
-
 		commands.update(process.cwd(), function (err) {
-			if(err) return console.log(err)
-			var dirs = new AppDirectory(args.appName)
-			var appDir = path.dirname(dirs.userData())
+			if(err) return callback(err)
 			var updateFile = path.join(appDir, '.update')
-			fs.unlink(updateFile, function () {
-				var execPath = args.argv.shift()
-				var child = spawn(execPath, args.argv, {
-					detached: true,
-					cwd: args.cwd,
-					stdio: [ 'ignore', 'pipe', 'pipe'] // out, err]
-				});
-				child.unref();
+			fs.unlink(updateFile, callback)
+		})
+	})
+}
 
-				console.log('restarting app!')
-				app.quit()
-			})
+if (argv.electronUpdate) {
+
+	var args = JSON.parse(argv.electronUpdate)
+	// {
+	//	name: appName,
+	//  exe: process.execPath,
+	// 	cwd: process.cwd(),
+	// 	argv: process.argv
+	// }
+
+	var appDir = directory.appDir(args.appName)
+	var pendingUpdatePath = path.join(appDir, '.update')
+	var _log = console.log
+	var _updateLog = path.join(appDir, 'update.log')
+	console.log = function (line) {
+		_log(line)
+		fs.appendFile(_updateLog, line + '\n')
+	}
+
+	// Flag an update as pending
+	file.touch(pendingUpdatePath, 'INPROGRESS', function (err) {
+		if(err) return console.log(err)
+
+		// Attempt to actually udpate now.
+		update(function (err) {
+			if(err) {
+				// If the update fails for security reasons, then we have to attempt to relaunch this process
+				// with the right permissions.
+				if(err.code === 'EACCESS') {
+					// relaunch self as an elevated process
+					runas.elevate(args.appName, process.execPath, process.argv.slice(1), process.cwd(), function (err) {
+						if(err) return console.log(err)
+						// Watch for changes to the .update file, it will become empty when the update succeeds.
+						fs.watchFile(pendingUpdatePath, {persistent: true, interval:500}, function () {
+							fs.readFile(pendingUpdatePath, {encoding:'utf8'}, function (err, contents) {
+								if(err) return console.log(err)
+								if(contents === '') {
+									// When update is done the file will be changed to have empty content
+									fs.unwatchFile(pendingUpdatePath)
+									var child = spawn(args.exe, args.argv, {
+										detached: true,
+										cwd: args.cwd,
+										stdio: [ 'ignore', 'pipe', 'pipe'] // out, err]
+									});
+									child.unref();
+									app.quit()
+								} else if(contents === 'PENDING') {
+									// Going back to a PENDING state means that the elevated process
+									// failed to update for an unexpected reason. In that case
+									// just shutdown and wait for the next attempt.
+									fs.unwatchFile(pendingUpdatePath)
+									app.quit()
+								}
+							})
+						})
+					})
+				} else {
+					console.log(err)
+					file.touch(pendingUpdatePath, 'PENDING', function () {
+						app.quit()
+					})
+				}
+			} else {
+				// Update was successful!
+				file.touch(pendingUpdatePath, '', function (err) {
+					if(err) console.log(err)
+					app.quit()
+				})
+			}
 		})
 	})
 } else {

@@ -64,6 +64,18 @@ program
 		})
 	})
 
+program
+	.command('test')
+	.action(function () {
+		help = false
+		require('../lib/runas.js').elevate('Evolve', 'notepad.exe', [], process.cwd(), function (err, child) {
+			child.on('exit', function (code) {
+				console.log(code)
+			})
+		})
+
+	})
+
 program.parse(process.argv)
 if(help) {
 	program.help()
