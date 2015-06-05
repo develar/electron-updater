@@ -10,31 +10,11 @@ var commands = require('./lib/commands.js'),
 
 var argv = minimist(process.argv.slice(2))
 
-function update(callback) {
-	var app = require('app')
-	var BrowserWindow = require('browser-window')
-	app.on('ready', function () {
-		var win = new BrowserWindow({ 
-			width: 400,
-			height: 100,
-			frame: false
-		})
-    win.loadUrl('file://' + __dirname + '/update.html')
-    ipc.on('initialize', function (event, arg) {
-    	event.sender.send('initialize', args)
-    })
+if (argv['electron-update']) {
 
-		commands.update(process.cwd(), function (err) {
-			if(err) return callback(err)
-			var updateFile = path.join(appDir, '.update')
-			fs.unlink(updateFile, callback)
-		})
-	})
-}
-
-if (argv.electronUpdate) {
-
-	var args = JSON.parse(argv.electronUpdate)
+	var encodedArgs = argv['electron-update']
+	var decodedArgs = new Buffer(encodedArgs, 'base64').toString('ascii')
+	var args = JSON.parse(decodedArgs)
 	// {
 	//	name: appName,
 	//  exe: process.execPath,
@@ -44,25 +24,41 @@ if (argv.electronUpdate) {
 
 	var appDir = directory.appDir(args.appName)
 	var pendingUpdatePath = path.join(appDir, '.update')
+	var _updateLog = path.join(appDir, 'update.log')	
 	var _log = console.log
-	var _updateLog = path.join(appDir, 'update.log')
 	console.log = function (line) {
 		_log(line)
-		fs.appendFile(_updateLog, line + '\n')
+		fs.appendFile(_updateLog, '- ' + line + '\n')
 	}
+
+	console.log('updating...')
 
 	// Flag an update as pending
 	file.touch(pendingUpdatePath, 'INPROGRESS', function (err) {
 		if(err) return console.log(err)
 
 		// Attempt to actually udpate now.
-		update(function (err) {
+		var app = require('app')
+		var BrowserWindow = require('browser-window')
+
+		var win = new BrowserWindow({
+			width: 400,
+			height: 100,
+			frame: false
+		})
+		win.loadUrl('file://' + __dirname + '/update.html')
+		ipc.on('initialize', function (event, arg) {
+			event.sender.send('initialize', args)
+		})
+
+		commands.update(process.cwd(), function (err) {
 			if(err) {
 				// If the update fails for security reasons, then we have to attempt to relaunch this process
 				// with the right permissions.
-				if(err.code === 'EACCESS') {
+				if(err.code === 'EPERM') {
+					console.log('No permission to update, elevating...')
 					// relaunch self as an elevated process
-					runas.elevate(args.appName, process.execPath, process.argv.slice(1), process.cwd(), function (err) {
+					launch.elevate(args.appName, process.execPath, process.argv.slice(1), process.cwd(), function (err) {
 						if(err) return console.log(err)
 						// Watch for changes to the .update file, it will become empty when the update succeeds.
 						fs.watchFile(pendingUpdatePath, {persistent: true, interval:500}, function () {
