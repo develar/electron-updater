@@ -76,12 +76,42 @@ describe('context', function () {
     })
     describe('pending update', function () {
       describe('when the .update file is available', function () {
-        it('should set pendingUpdate to true', function (done) {
-          _fs.stat.callsArgWith(1, null, {isFile: sinon.stub().returns(true) })
-          context.load('/test', function (err, context) {
-            if(err) return done(err)
-            expect(context.pendingUpdate).to.be.true
-            done()
+        describe('and contains PENDING', function () {
+          beforeEach(function () {
+            _fs.readFile.callsArgWith(2, null, 'PENDING')
+          })
+          it('should set updatePending to true', function (done) {
+            context.load('/test', function (err, context) {
+              if(err) return done(err)
+              expect(context.updatePending).to.be.true
+              done()
+            })
+          })
+          it('should set updateInProgress to false', function (done) {
+            context.load('/test', function (err, context) {
+              if(err) return done(err)
+              expect(context.updateInProgress).to.be.false
+              done()
+            })
+          })
+        })
+        describe('and contains INPROGRESS', function (done) {
+          beforeEach(function () {
+            _fs.readFile.callsArgWith(2, null, 'INPROGRESS')
+          })
+          it('should set updatePending to true', function (done) {
+            context.load('/test', function (err, context) {
+              if(err) return done(err)
+              expect(context.updatePending).to.be.false
+              done()
+            })
+          })
+          it('should set updateInProgress to false', function (done) {
+            context.load('/test', function (err, context) {
+              if(err) return done(err)
+              expect(context.updateInProgress).to.be.true
+              done()
+            })
           })
         })
       })
@@ -89,7 +119,7 @@ describe('context', function () {
         it('should set pendingUpdate to false', function (done) {
           context.load('/test', function (err, context) {
             if(err) return done(err)
-            expect(context.pendingUpdate).to.be.false
+            expect(context.updatePending).to.be.false
             done()
           })
         })

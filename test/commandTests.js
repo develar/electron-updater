@@ -2,7 +2,7 @@ var proxyquire = require('proxyquire').noCallThru()
   sinon = require('sinon'),
   expect = require('chai').expect
 
-describe('commands', function () {
+describe('command,', function () {
 
   var commands,
     _mocks,
@@ -64,7 +64,7 @@ describe('commands', function () {
     _update.update.callsArg(1)
     _copier.copy.callsArgWith(2, null, '/tmp/app')
     _child_process.spawn.returns(_child)
-    _file.touch.callsArg(1)
+    _file.touch.callsArg(2)
   })
 
   describe('isValid', function () {
@@ -249,7 +249,7 @@ describe('commands', function () {
     })
   })
 
-  describe('start', function () {
+  describe('start,', function () {
     var _ready,
       _updateAvailable,
       _updateRequired
@@ -279,7 +279,7 @@ describe('commands', function () {
         done(err)
       })
     })
-    describe('when valid', function () {
+    describe('when valid,', function () {
       beforeEach(function () {
         _exists.check.callsArgWith(1, null, true)
       })
@@ -310,7 +310,7 @@ describe('commands', function () {
           done(err)
         })
       })
-      it('should emit update available if a dependency has a update available', function (done) {
+      it('should emit updateAvailable if a dependency has a update available', function (done) {
         _check.check.onSecondCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
           expect(_updateAvailable.called).to.be.true
@@ -324,7 +324,7 @@ describe('commands', function () {
           done(err)
         })
       })
-      it('should emit update available if it updates plugins', function (done) {
+      it('should emit updateAvailable if it updates plugins', function (done) {
         _check.check.onThirdCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
           expect(_updateAvailable.called).to.be.true
@@ -350,7 +350,7 @@ describe('commands', function () {
       })
       it('should pass the arg --electron-update when spawning', function (done) {
         commands.start(function (err) {
-          expect(_child_process.spawn.calledWith(sinon.match.string, [sinon.match.string, '--electron-update', sinon.match.string])).to.be.true
+          expect(_child_process.spawn.calledWith(sinon.match.string, [sinon.match.string, sinon.match(function (value) { return value.indexOf('--electron-update=') === 0 }) ])).to.be.true
           done(err)
         })
       })
