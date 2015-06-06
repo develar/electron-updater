@@ -41,8 +41,7 @@ if (argv['electron-update']) {
 		fs.appendFile(_updateLog, '- ' + line + '\n')
 	}
 
-	console.log('updating...')
-	console.log('args: ' + util.inspect(argv))
+	console.log('updating from: ' + process.pid)
 	console.log('relaunch: ' + relaunch)
 
 	// Flag an update as pending
