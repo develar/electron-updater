@@ -1,22 +1,28 @@
 #!/usr/bin/env node
 var commands = require('../lib/commands.js'),
 	program = require('commander'),
-	util = require('util')
+	util = require('util'),
+	Logger = require('../lib/logger.js')
 
 var help = true
-program.version('1.0.0')
+program
+	.version('1.0.0')
+	.option('-v, --verbose', 'Enable verbose output.')
+
 program
 	.command('check [appdir]')
 	.description('Check for updates and dependencies with updates.')
 	.action(function(appdir) {
 		help = false
-		console.log('checking...')
-		commands.check(appdir || process.cwd(), function (err, found) {
+		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
+		commands.check(appdir || process.cwd(), { logger: logger }, function (err, found) {
 			if(err) return console.log('error: ' + util.inspect(err))
 			if(!found) {
 				console.log('no updates found.');
 			} else {
-				console.log('found: ' + util.inspect(found))
+				console.log('app: ' + (found.app ? util.inspect(found.app) : 'ok.'))
+				console.log('dependencies: ' + (found.dependencies.length > 0 ? util.inspect(found.dependencies) : 'ok.'))
+				console.log('plugins: ' + (found.plugins.length > 0 ? util.inspect(found.plugins) : 'ok.'))
 			}
 		})
 	})
@@ -26,7 +32,11 @@ program
 	.description('Watch for updates on an interval.')
 	.action(function (appdir) {
 		help = false
-		commands.watch(appdir || process.cwd())
+		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
+		commands.watch(appdir || process.cwd(), {logger:logger}, function (err, update) {
+			if(err) return console.error(error)
+			console.log('update: ' + util.inspect(update))
+		})
 	})
 
 program
@@ -34,7 +44,8 @@ program
 	.description('Update all dependencies right now.')
 	.action(function (appdir) {
 		help = false
-		commands.update(appdir || process.cwd(), function (err) {
+		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
+		commands.update(appdir || process.cwd(), {logger:logger}, function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')		
 		})
@@ -45,7 +56,8 @@ program
 	.description('List all current dependencies and their versions')
 	.action(function (appdir) {
 		help = false
-		commands.list(appdir || process.cwd(), function (err, deps) {
+		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
+		commands.list(appdir || process.cwd(), {logger:logger}, function (err, deps) {
 			if(err) return console.log('' + err)
 			console.log(util.inspect(deps))
 		})
@@ -58,22 +70,11 @@ program
 	.description('Determines if all dependencies and plugins are already installed and satisfy the version requirements')
 	.action(function (appdir) {
 		help = false
-		commands.isValid(appdir || process.cwd(), function (err, valid) {
+		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
+		commands.isValid(appdir || process.cwd(), {logger:logger}, function (err, valid) {
 			if(err) return console.log('' + err)
-			console.log(valid)
+			console.log(valid ? 'valid' : 'invalid')
 		})
-	})
-
-program
-	.command('test')
-	.action(function () {
-		help = false
-		require('../lib/runas.js').elevate('Evolve', 'notepad.exe', [], process.cwd(), function (err, child) {
-			child.on('exit', function (code) {
-				console.log(code)
-			})
-		})
-
 	})
 
 program.parse(process.argv)

@@ -6,10 +6,13 @@ var commands = require('./lib/commands.js'),
 	minimist = require('minimist'),
 	launch = require('./lib/launch.js'),
 	directory = require('./lib/directory.js'),
-	file = require('./lib/file.js')
+	file = require('./lib/file.js'),
+	Logger = require('./lib/logger.js')
 
-function _launch(args) {
-	console.log('relaunching app.')
+function _launch(args, logger) {
+	logger.log('launching ' + args.exe)
+	logger.log('  argv: ' + util.inspect(args.argv))
+	logger.log('  cwd: ' + args.cwd)
 	var child = spawn(args.exe, args.argv, {
 		detached: true,
 		cwd: args.cwd,
@@ -29,20 +32,19 @@ if (argv['electron-update']) {
 	//	name: appName,
 	//  exe: process.execPath,
 	// 	cwd: process.cwd(),
-	// 	argv: process.argv
+	// 	argv: process.argv,
+	//  debug: true
 	// }
 
 	var appDir = directory.appDir(args.appName)
 	var pendingUpdatePath = path.join(appDir, '.update')
-	var _updateLog = path.join(appDir, 'update.log')	
-	var _log = console.log
-	console.log = function (line) {
-		_log(line)
-		fs.appendFile(_updateLog, '- ' + line + '\n')
-	}
+	var logger = new Logger(appDir, Logger.appendToFile, args.debug)
 
-	console.log('updating from: ' + process.pid)
-	console.log('relaunch: ' + relaunch)
+	logger.log('Starting Update:')
+	logger.log('  args: ' + util.inspect(args))	
+	process.on('uncaughtException', function (err) {
+		logger.log('uncaught exception: ' + err)
+	})
 
 	// Flag an update as pending
 	file.touch(pendingUpdatePath, 'INPROGRESS', function (err) {
@@ -51,7 +53,6 @@ if (argv['electron-update']) {
 		// Attempt to actually udpate now.
 		var app = require('app')
 		var BrowserWindow = require('browser-window')
-
 		var win = new BrowserWindow({
 			width: 400,
 			height: 100,
@@ -59,15 +60,19 @@ if (argv['electron-update']) {
 		})
 		win.loadUrl('file://' + __dirname + '/update.html')
 		ipc.on('initialize', function (event, arg) {
+			logger.log('Initialized.')
 			event.sender.send('initialize', args)
 		})
+		ipc.on('log', function (event, arg) {
+			logger.log(arg)
+		})
 
-		commands.update(process.cwd(), function (err) {
+		commands.update(process.cwd(), logger, function (err) {
 			if(err) {
 				// If the update fails for security reasons, then we have to attempt to relaunch this process
 				// with the right permissions.
 				if(err.code === 'EPERM') {
-					console.log('No permission to update, elevating...')
+					logger.log('No permission to update, elevating...')
 
 					var elevatedArgs = process.argv.slice(1)
 
@@ -76,47 +81,45 @@ if (argv['electron-update']) {
 
 					// relaunch self as an elevated process
 					launch.elevate(args.appName, process.execPath, elevatedArgs, process.cwd(), function (err) {
-						if(err) return console.log(err)
+						if(err) return logger.log(err)
 						// Watch for changes to the .update file, it will become empty when the update succeeds.
 						fs.watchFile(pendingUpdatePath, {persistent: true, interval:500}, function () {
 							fs.readFile(pendingUpdatePath, {encoding:'utf8'}, function (err, contents) {
-								if(err) return console.log(err)
-								if(contents === '') {
-									// When update is done the file will be changed to have empty content
-									fs.unwatchFile(pendingUpdatePath)
-									if (relaunch) {
-										console.log('relaunching from unelevated process.')
-										_launch(args)
-									}
-									app.quit()
-								} else if(contents === 'PENDING') {
+								if(err || contents === 'PENDING') {
+									if(err) console.log(err)
 									// Going back to a PENDING state means that the elevated process
 									// failed to update for an unexpected reason. In that case
 									// just shutdown and wait for the next attempt.
 									fs.unwatchFile(pendingUpdatePath)
+									app.quit()
+								} else if(contents === '') {
+									// When update is done the file will be changed to have empty content
+									fs.unwatchFile(pendingUpdatePath)
+									if (relaunch) {
+										logger.log('relaunching from unelevated process.')
+										_launch(args, logger)
+									}
 									app.quit()
 								}
 							})
 						})
 					})
 				} else {
-					console.log('update failed for an unexected reason.')
-					console.log(err)
-					file.touch(pendingUpdatePath, 'PENDING', function () {
+					logger.error('update failed for an unexected reason.')
+					logger.error(err)
+					file.touch(pendingUpdatePath, 'PENDING', function (err) {
+						if(err) logger.error(err)
 						app.quit()
 					})
 				}
 			} else {
 				// Update was successful!
-				console.log('updated succeeded!')
+				logger.log('updated succeeded.')
 				file.touch(pendingUpdatePath, '', function (err) {
-					if(err) console.log(err)
+					if(err) logger.log(err)
 
 					// If the app was already running as admin, this flag will be missing. Go ahead and re-launch the app.
-					if(relaunch) {
-						console.log('relaunching app.')
-						_launch(args)
-					}
+					if(relaunch) _launch(args, logger)
 
 					app.quit()
 				})

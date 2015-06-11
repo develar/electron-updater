@@ -28,7 +28,9 @@
   "dependencies": {
     "appdirectory": "^0.1.0",
     "async": "^0.9.0",
+    "got": "^3.2.0",
     "minimist": "^1.1.1",
+    "mkdirp": "^0.5.1",
     "semver": "^4.3.3",
     "spin": "0.0.1",
     "tar-stream": "^1.1.4"
