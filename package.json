@@ -1,6 +1,6 @@
 {
   "name": "electron-updater",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Cross platform auto-updater for electron applications",
   "main": "index.js",
   "author": "Evolve LLC",
@@ -33,6 +33,14 @@
     "spin": "0.0.1",
     "tar-stream": "^1.1.4"
   },
+  "bundledDependencies": [
+    "appdirectory",
+    "async",
+    "minimist",
+    "semver",
+    "spin",
+    "tar-stream"
+  ],
   "devDependencies": {
     "chai": "^2.3.0",
     "colors": "^1.1.0",
