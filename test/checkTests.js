@@ -5,7 +5,7 @@ var proxyquire = require('proxyquire').noCallThru()
 describe('checking', function () {
 
   var checker,
-    _download,
+    got,
     _file,
     _fs,
     _mocks,
@@ -19,9 +19,7 @@ describe('checking', function () {
       registry: 'http://npm.test.com',
       appDir: '/test'
     }
-    _download = {
-      getJson: sinon.stub()
-    }
+    _got = sinon.stub()
     _file = {
       readJson: sinon.stub()
     }
@@ -29,9 +27,9 @@ describe('checking', function () {
       stat: sinon.stub()
     }
     _mocks = {
-      './download.js': _download,
       './file.js': _file,
-      'fs': _fs
+      'fs': _fs,
+      'got': _got
     }
     checker = proxyquire('../lib/check.js', _mocks)
   })
@@ -47,9 +45,9 @@ describe('checking', function () {
 
     describe('when a new version is available', function () {
       beforeEach(function () {
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-app')
-          .callsArgWith(1, null, {'dist-tags': {'latest': '1.0.1'}})
+          .callsArgWith(2, null, {'dist-tags': {'latest': '1.0.1'}})
       })
       it('should return the available version', function (done) {
         checker.check(_item, function (err, result) {
@@ -62,9 +60,9 @@ describe('checking', function () {
 
     describe('when a new version is not available', function () {
       beforeEach(function () {
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-app')
-          .callsArgWith(1, null, {'dist-tags': {'latest': '1.0.0'}})
+          .callsArgWith(2, null, {'dist-tags': {'latest': '1.0.0'}})
       })
       it('should return undefined', function (done) {
         checker.check(_item, function (err, result) {
@@ -93,9 +91,9 @@ describe('checking', function () {
       beforeEach(function () {
         _file.readJson
           .callsArgWith(1, 'ENOENT')
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-dependency')
-          .callsArgWith(1, null, {versions:{'1.0.0': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.0': {}}})
       })
       it('should return latest version', function (done) {
         checker.check(_item, function (err, result) {
@@ -110,9 +108,9 @@ describe('checking', function () {
       beforeEach(function () {
         _file.readJson
           .callsArgWith(1, null, {version:'1.0.0'})
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-dependency')
-          .callsArgWith(1, null, {versions:{'1.0.1': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.1': {}}})
       })
       it('should return the newer version', function (done) {
         checker.check(_item, function (err, result) {
@@ -127,9 +125,9 @@ describe('checking', function () {
       beforeEach(function () {
         _file.readJson
           .callsArgWith(1, null, {version:'1.0.0'})
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-dependency')
-          .callsArgWith(1, null, {versions:{'1.0.0': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.0': {}}})
       })
       it('should return undefined', function (done) {
         checker.check(_item, function (err, result) {
@@ -159,9 +157,9 @@ describe('checking', function () {
           .callsArgWith(1, 'ENOENT')
         _fs.stat
           .callsArgWith(1, 'ENOENT')
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-plugin')
-          .callsArgWith(1, null, {versions:{'1.0.0': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.0': {}}})
       })
       it('should return the latest version', function (done) {
         checker.check(_item, function (err, result) {
@@ -178,9 +176,9 @@ describe('checking', function () {
           .callsArgWith(1, null, {'test-plugin': '1.0.0'})
         _fs.stat
           .callsArgWith(1, 'ENOENT')
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-plugin')
-          .callsArgWith(1, null, {versions:{'1.0.0': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.0': {}}})
       })
       it('should return the latest version', function (done) {
         checker.check(_item, function (err, result) {
@@ -201,9 +199,9 @@ describe('checking', function () {
         _fs.stat
           .onSecondCall()
           .callsArgWith(1, null)
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-plugin')
-          .callsArgWith(1, null, {versions:{'1.0.1': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.1': {}}})
       })
       it('should return the latest version', function (done) {
         checker.check(_item, function (err, result) {
@@ -237,9 +235,9 @@ describe('checking', function () {
           .callsArgWith(1, 'ENOENT')
         _fs.stat
           .callsArgWith(1, null)
-        _download.getJson
+        _got
           .withArgs('http://npm.test.com/test-plugin')
-          .callsArgWith(1, null, {versions:{'1.0.0': {}}})
+          .callsArgWith(2, null, {versions:{'1.0.0': {}}})
       })
       it('should return undefined', function (done) {
         checker.check(_item, function (err, result) {

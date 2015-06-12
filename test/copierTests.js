@@ -11,7 +11,6 @@ describe('copier', function () {
     _file,
     _fs,
     _directory,
-    _appDirectory,
     _context,
     _files
 
@@ -28,17 +27,14 @@ describe('copier', function () {
     }
     _fs.readdir.callsArgWith(1, null, [])
     _directory = {
-      create: sinon.stub()
+      create: sinon.stub(),
+      appDir: sinon.stub().returns(path.join('/test'))
     }
     _directory.create.callsArgWith(1)
-    _appDirectory = function () {
-      return { userData: sinon.stub().returns(path.join('/test', 'test')) }
-    }
     _mocks = {
       './file.js': _file,
       './directory.js': _directory,
-      'original-fs': _fs,
-      'appdirectory': _appDirectory
+      'original-fs': _fs
     }
     process.versions.electron = '1.0.0'
     copier = proxyquire('../lib/copier.js', _mocks)
