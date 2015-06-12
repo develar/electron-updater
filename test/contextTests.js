@@ -65,11 +65,23 @@ describe('context', function () {
         })
       })
       describe('when the .channel is not available', function () {
-        it('should default the channel to latest', function (done) {
-          context.load('/test', function (err, context) {
-            if(err) return done(err)
-            expect(context.channel).to.equal('latest')
-            done()
+        describe('and is set in package.json', function () {
+          it('should default the channel to default', function (done) {
+            _file.readJson.callsArgWith(1, null, {name:'test', defaultChannel:'default'})
+            context.load('/test', function (err, context) {
+              if(err) return done(err)
+              expect(context.channel).to.equal('default')
+              done()
+            })
+          })
+        })
+        describe('and is not set in package.json', function () {
+          it('should default the channel to "latest"', function (done) {
+            context.load('/test', function (err, context) {
+              if(err) return done(err)
+              expect(context.channel).to.equal('latest')
+              done()
+            })
           })
         })
       })
