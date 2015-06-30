@@ -30,13 +30,14 @@ if (argv['electron-update']) {
 	var args = JSON.parse(decodedArgs)
 	// {
 	//	name: appName,
+	//  publisher: publisher,
 	//  exe: process.execPath,
 	// 	cwd: process.cwd(),
 	// 	argv: process.argv,
 	//  debug: true
 	// }
 
-	var appDir = directory.appDir(args.appName)
+	var appDir = directory.appDir(args.publisher, args.appName)
 	var pendingUpdatePath = path.join(appDir, '.update')
 	var logger = new Logger(appDir, Logger.appendToFile, args.debug)
 
@@ -80,7 +81,7 @@ if (argv['electron-update']) {
 					elevatedArgs.push('--no-relaunch')
 
 					// relaunch self as an elevated process
-					launch.elevate(args.appName, process.execPath, elevatedArgs, process.cwd(), function (err) {
+					launch.elevate(args.publisher, args.appName, process.execPath, elevatedArgs, process.cwd(), function (err) {
 						if(err) return logger.log(err)
 						// Watch for changes to the .update file, it will become empty when the update succeeds.
 						fs.watchFile(pendingUpdatePath, {persistent: true, interval:500}, function () {

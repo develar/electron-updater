@@ -11,14 +11,14 @@ var fs = require('fs'),
 var valid = false
 program
     .version('0.0.1')
-    .usage('[options] <appname>')
-    .option('-u, --unlink', 'Unlink a plugin from <appname>')
+    .usage('[options] <publisher> <appname>')
+    .option('-u, --unlink', 'Unlink a plugin from <publisher>/<appname>')
 
 program
-    .arguments('<appname>')
-    .action(function (appname) {
+    .arguments('<publisher> <appname>')
+    .action(function (publisher, appname) {
         valid = true
-        linkPlugin(appname)
+        linkPlugin(publisher, appname)
     })
 
 program.parse(process.argv);
@@ -30,11 +30,7 @@ if (!valid) {
     process.exit(1);
 }
 
-function updateCurrent(appData, name, version) {
-
-}
-
-function linkPlugin(appName, callback) {
+function linkPlugin(publisher, appName, callback) {
     fs.readFile('package.json', {encoding: 'utf8'}, function (err, data) {
         if(err) echo('[' + 'error'.red + '] package.json not found in current working directory') && process.exit(1)
         var package = JSON.parse(data)
