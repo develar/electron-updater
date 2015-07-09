@@ -1,6 +1,6 @@
 {
   "name": "electron-updater",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Cross platform auto-updater for electron applications",
   "main": "index.js",
   "author": "Evolve LLC",
