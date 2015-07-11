@@ -35,8 +35,11 @@ function linkPlugin(publisher, appName, callback) {
         if(err) echo('[' + 'error'.red + '] package.json not found in current working directory') && process.exit(1)
         var package = JSON.parse(data)
         var pluginName = package.name
-        var dirs = new AppDirectory(appName)
-        var appData = path.dirname(dirs.userData())
+        var dirs = new AppDirectory({
+            appName: appName,
+            appAuthor: publisher
+        })
+        var appData = dirs.userData()
         var pluginsDir = path.join(appData, 'plugins')
         var pluginDir = process.cwd()
         var linkDir = path.join(pluginsDir, pluginName)
