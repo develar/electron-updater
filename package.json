@@ -32,7 +32,8 @@
     "minimist": "^1.1.1",
     "semver": "^4.3.3",
     "spin": "0.0.1",
-    "tar-stream": "^1.1.4"
+    "tar-stream": "^1.1.4",
+    "shelljs": "^0.4.0",
   },
   "bundledDependencies": [
     "appdirectory",
@@ -41,7 +42,8 @@
     "minimist",
     "semver",
     "spin",
-    "tar-stream"
+    "tar-stream",
+    "shelljs"
   ],
   "devDependencies": {
     "chai": "^2.3.0",
@@ -49,7 +51,6 @@
     "commander": "^2.8.1",
     "mocha": "^2.2.4",
     "proxyquire": "^1.4.0",
-    "shelljs": "^0.4.0",
     "sinon": "^1.14.1"
   }
 }
