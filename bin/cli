@@ -15,7 +15,7 @@ program
 	.action(function(appdir) {
 		help = false
 		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
-		commands.check(appdir || process.cwd(), { logger: logger }, function (err, found) {
+		commands.check(appdir || process.cwd(), logger, function (err, found) {
 			if(err) return console.log('error: ' + util.inspect(err))
 			if(!found) {
 				console.log('no updates found.');
@@ -33,7 +33,7 @@ program
 	.action(function (appdir) {
 		help = false
 		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
-		commands.watch(appdir || process.cwd(), {logger:logger}, function (err, update) {
+		commands.watch(appdir || process.cwd(), logger, function (err, update) {
 			if(err) return console.error(error)
 			console.log('update: ' + util.inspect(update))
 		})
@@ -45,7 +45,7 @@ program
 	.action(function (appdir) {
 		help = false
 		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
-		commands.update(appdir || process.cwd(), {logger:logger}, function (err) {
+		commands.update(appdir || process.cwd(), logger, function (err) {
 			if(err) return console.log('' + util.inspect(err))			
 			console.log('updated!')		
 		})
@@ -57,7 +57,7 @@ program
 	.action(function (appdir) {
 		help = false
 		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
-		commands.list(appdir || process.cwd(), {logger:logger}, function (err, deps) {
+		commands.list(appdir || process.cwd(), logger, function (err, deps) {
 			if(err) return console.log('' + err)
 			console.log(util.inspect(deps))
 		})
@@ -71,7 +71,7 @@ program
 	.action(function (appdir) {
 		help = false
 		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
-		commands.isValid(appdir || process.cwd(), {logger:logger}, function (err, valid) {
+		commands.isValid(appdir || process.cwd(), logger, function (err, valid) {
 			if(err) return console.log('' + err)
 			console.log(valid ? 'valid' : 'invalid')
 		})
