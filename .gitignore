@@ -2,6 +2,7 @@
 node_modules
 plugins
 .settings
+.DS_Store
 
 #files
 *.tgz
