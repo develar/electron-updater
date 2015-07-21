@@ -16,7 +16,7 @@ function _launch(args, logger) {
 	var child = spawn(args.exe, args.argv, {
 		detached: true,
 		cwd: args.cwd,
-		stdio: [ 'ignore', 'pipe', 'pipe'] // out, err]
+		stdio: [ 'ignore', 'ignore', 'ignore']
 	});
 	child.unref();
 }
