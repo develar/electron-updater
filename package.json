@@ -21,9 +21,7 @@
   },
   "bin": {
     "electron-updater": "./bin/cli",
-    "elup": "./bin/cli",
-    "link-plugin": "./bin/link-plugin",
-    "lnp": "./bin/link-plugin"
+    "elup": "./bin/cli"
   },
   "dependencies": {
     "appdirectory": "^0.1.0",
