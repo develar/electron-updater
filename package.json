@@ -31,8 +31,6 @@
     "semver": "^4.3.3",
     "spin": "0.0.1",
     "tar-stream": "^1.1.4",
-    "shelljs": "^0.4.0",
-    "colors": "^1.1.0",
     "commander": "^2.8.1"
   },
   "bundledDependencies": [
