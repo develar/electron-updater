@@ -84,7 +84,7 @@ describe('copier', function () {
         expectDirs(source, f)
       }      
     } else {
-        var dest = path.join('/app/test/updater/1.0.0', source)
+        var dest = path.join('/test/updater/1.0.0', source)
         expect(_file.copy.calledWith(source, dest)).to.be.true
     }
   }
