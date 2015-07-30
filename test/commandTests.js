@@ -62,7 +62,7 @@ describe('command,', function () {
     _check.check.callsArgWith(1, null, [])
     _check.check.onFirstCall().callsArgWith(1, null)
     _update.update.callsArg(2)
-    _copier.copy.callsArgWith(2, null, '/tmp/app')
+    _copier.copy.callsArgWith(3, null, '/tmp/app')
     _child_process.spawn.returns(_child)
     _file.touch.callsArg(2)
   })
