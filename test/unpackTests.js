@@ -127,6 +127,14 @@ describe('unpack', function () {
           _extract.on.withArgs('entry').callArgWith(1, {name: 'package/test.js', type: 'file'}, _entry, _cb)
           _extract.on.withArgs('finish').callArg(1)          
         })
+        it('should preserve the mode on the created file', function (done) {
+          unpack.extract('/test', _res, function (err) {
+            expect(_fs.createWriteStream.withArgs(sinon.match.string, {mode:'066'}).called).to.be.true
+            done()
+          })
+          _extract.on.withArgs('entry').callArgWith(1, {name: 'package/test.js', type: 'file', mode: '066'}, _entry, _cb)
+          _extract.on.withArgs('finish').callArg(1)
+        })
       })
       describe('other', function () {
         it('should ignore other types of entries', function (done) {
