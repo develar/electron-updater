@@ -24,7 +24,7 @@ describe('update', function () {
             dependencies: [],
             plugins: []
         }
-        _res = {}
+        _res = { on: sinon.stub() }
         _got = sinon.stub().returns(_res)
         _unpack = {
             extract: sinon.stub()
@@ -85,6 +85,14 @@ describe('update', function () {
                     done(err)
                 })
             })
+            it('should download binaries', function (done) {
+                var pkg = { binaries: ['http://example.com/test.tgz'] }
+                _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
+                update.update(_deps, _logger, function (err) {
+                    expect(_got.withArgs('http://example.com/test.tgz').called).to.be.true
+                    done(err)
+                })
+            })
         })
         describe('update not available', function () {
             it('should not update the app if its not out of date', function (done) {
@@ -118,10 +126,19 @@ describe('update', function () {
                 done(err)
             })        
         })
+        it('should download binaries', function (done) {
+            var pkg = { binaries: ['http://example.com/test.tgz'] }
+            _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
+            update.update(_deps, _logger, function (err) {
+                expect(_got.withArgs('http://example.com/test.tgz').called).to.be.true
+                done(err)
+            })
+        })
         describe('with sub-dependencies', function () {
             beforeEach(function () {
                 var pkg = { dependencies: { testSub: '^1.0.0' } }
                 _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
+                _file.readJson.onSecondCall().callsArgWith(1, null, pkg)
             })
             it('should get sub dependencies', function (done) {            
                 update.update(_deps, _logger, function (err) {
@@ -155,6 +172,7 @@ describe('update', function () {
             beforeEach(function () {
                 var pkg = { dependencies: { testSub: '^1.0.0' } }
                 _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
+                _file.readJson.onSecondCall().callsArgWith(1, null, pkg)
             })
             it('should get sub dependencies', function (done) {            
                 update.update(_deps, _logger, function (err) {
@@ -167,6 +185,14 @@ describe('update', function () {
                     expect(_unpack.extract.calledTwice).to.be.true
                     done(err)
                 })
+            })
+        })        
+        it('should download binaries', function (done) {
+            var pkg = { binaries: ['http://example.com/test.tgz'] }
+            _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
+            update.update(_deps, _logger, function (err) {
+                expect(_got.withArgs('http://example.com/test.tgz').called).to.be.true
+                done(err)
             })
         })
         it('should update plugins', function (done) {
