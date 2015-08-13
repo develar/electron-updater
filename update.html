@@ -16,13 +16,16 @@
   </body>
   <script>
   	var ipc = require('ipc'),
-  		util = require('util')
-  	var spinnerElement = document.getElementById('spinner')
-  	var nameElement = document.getElementById('name')
-  	new Spinner({color:'#000', lines: 12}).spin(spinnerElement)
-  	ipc.on('initialize', function(arg) {
-  		nameElement.innerHTML = arg.appName
-	});
-	ipc.send('initialize')
+  		  util = require('util');
+        
+    document.addEventListener("DOMContentLoaded", function(event) {      
+      var spinnerElement = document.getElementById('spinner');
+      var nameElement = document.getElementById('name');
+      new Spinner({color:'#000', lines: 12}).spin(spinnerElement);
+      ipc.on('initialize', function(arg) {
+        nameElement.innerHTML = arg.appName;
+      });
+      ipc.send('initialize');
+    });
   </script>
 </html>
