@@ -1,6 +1,6 @@
 {
   "name": "electron-updater",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Cross platform auto-updater for electron applications",
   "main": "index.js",
   "author": "Evolve LLC",
@@ -27,6 +27,7 @@
     "appdirectory": "^0.1.0",
     "async": "^0.9.0",
     "commander": "^2.8.1",
+    "glob": "^5.0.14",
     "got": "^4.1.1",
     "minimist": "^1.1.1",
     "semver": "^4.3.3",
@@ -37,6 +38,7 @@
   "bundledDependencies": [
     "appdirectory",
     "async",
+    "glob",
     "got",
     "minimist",
     "semver",
