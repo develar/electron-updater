@@ -10,7 +10,7 @@ describe('update', function () {
         _deps,
         _got,
         _res,
-        _unpack,
+        _cache,
         _file,
         _directory,
         _logger
@@ -26,8 +26,8 @@ describe('update', function () {
         }
         _res = { on: sinon.stub() }
         _got = sinon.stub().returns(_res)
-        _unpack = {
-            extract: sinon.stub()
+        _cache = {
+            get: sinon.stub()
         }
         _file = {
             readJson: sinon.stub(),
@@ -47,7 +47,7 @@ describe('update', function () {
         }
         _mocks = {
             'got': _got,
-            './unpack.js': _unpack,
+            './cache.js': _cache,
             './file.js': _file,
             './directory.js': _directory,
             './logger.js': _logger
@@ -55,7 +55,7 @@ describe('update', function () {
         update = proxyquire('../lib/update.js', _mocks)
 
         _got.withArgs(sinon.match.string, {json:true}).callsArgWith(2, null, { versions: { '1.0.0': {}, '1.0.1': {} }, dist: { tarball: 'http://test.com/update.tgz' } })
-        _unpack.extract.callsArgWith(2, null)
+        _cache.get.callsArgWith(5, null)
         _file.readJson.callsArgWith(1, null, { dependencies: {} })
         _file.writeJson.callsArgWith(2, null)
         _directory.create.callsArgWith(1, null)
@@ -81,7 +81,7 @@ describe('update', function () {
             it('should update the app', function (done) {
                 update.update(_deps, _logger, function (err) {
                     expect(_got.called).to.be.true
-                    expect(_unpack.extract.called).to.be.true
+                    expect(_cache.get.called).to.be.true
                     done(err)
                 })
             })
@@ -89,7 +89,7 @@ describe('update', function () {
                 var pkg = { binaries: ['http://example.com/test.tgz'] }
                 _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
                 update.update(_deps, _logger, function (err) {
-                    expect(_got.withArgs('http://example.com/test.tgz').called).to.be.true
+                    expect(_cache.get.withArgs('http://example.com/test.tgz').called).to.be.true
                     done(err)
                 })
             })
@@ -122,7 +122,7 @@ describe('update', function () {
         it('should update dependencies', function (done) {
             update.update(_deps, _logger, function (err) {
                 expect(_got.called).to.be.true
-                expect(_unpack.extract.called).to.be.true
+                expect(_cache.get.called).to.be.true
                 done(err)
             })        
         })
@@ -130,7 +130,7 @@ describe('update', function () {
             var pkg = { binaries: ['http://example.com/test.tgz'] }
             _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
             update.update(_deps, _logger, function (err) {
-                expect(_got.withArgs('http://example.com/test.tgz').called).to.be.true
+                expect(_cache.get.withArgs('http://example.com/test.tgz').called).to.be.true
                 done(err)
             })
         })
@@ -142,13 +142,13 @@ describe('update', function () {
             })
             it('should get sub dependencies', function (done) {            
                 update.update(_deps, _logger, function (err) {
-                    expect(_got.callCount).to.equal(5)
+                    expect(_got.callCount).to.equal(3)
                     done(err)
                 })
             })
             it('should extract sub dependencies', function (done) {            
                 update.update(_deps, _logger, function (err) {
-                    expect(_unpack.extract.calledTwice).to.be.true
+                    expect(_cache.get.calledTwice).to.be.true
                     done(err)
                 })
             })
@@ -163,7 +163,7 @@ describe('update', function () {
             it('should update plugins', function (done) {
                 update.update(_deps, _logger, function (err) {
                     expect(_got.called).to.be.true
-                    expect(_unpack.extract.called).to.be.true
+                    expect(_cache.get.called).to.be.true
                     done(err)
                 })
             })
@@ -176,13 +176,13 @@ describe('update', function () {
             })
             it('should get sub dependencies', function (done) {            
                 update.update(_deps, _logger, function (err) {
-                    expect(_got.callCount).to.equal(5)
+                    expect(_got.callCount).to.equal(3)
                     done(err)
                 })
             })
             it('should extract sub dependencies', function (done) {            
                 update.update(_deps, _logger, function (err) {
-                    expect(_unpack.extract.calledTwice).to.be.true
+                    expect(_cache.get.calledTwice).to.be.true
                     done(err)
                 })
             })
@@ -191,14 +191,14 @@ describe('update', function () {
             var pkg = { binaries: ['http://example.com/test.tgz'] }
             _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
             update.update(_deps, _logger, function (err) {
-                expect(_got.withArgs('http://example.com/test.tgz').called).to.be.true
+                expect(_cache.get.withArgs('http://example.com/test.tgz').called).to.be.true
                 done(err)
             })
         })
         it('should update plugins', function (done) {
             update.update(_deps, _logger, function (err) {
                 expect(_got.called).to.be.true
-                expect(_unpack.extract.called).to.be.true
+                expect(_cache.get.called).to.be.true
                 done(err)
             })
         })

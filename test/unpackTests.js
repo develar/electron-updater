@@ -60,21 +60,21 @@ describe('unpack', function () {
 
   describe('extract', function () {
     it('should create the directory extracting to', function (done) {
-      unpack.extract('/test', _res, function (err) {
+      unpack.extract('/test', _res, '.tgz', function (err) {
         expect(_directory.create.withArgs('/test').called).to.be.true
         done()
       })
       _extract.on.withArgs('finish').callArg(1)
     })
     it('should gunzip', function (done) {
-      unpack.extract('/test', _res, function (err) {
+      unpack.extract('/test', _res, '.tgz', function (err) {
         expect(_res.pipe.withArgs(_gunzip).called).to.be.true
         done()
       })
       _extract.on.withArgs('finish').callArg(1)      
     })
     it('should tar extract', function (done) {
-      unpack.extract('/test', _res, function (err) {
+      unpack.extract('/test', _res, '.tgz', function (err) {
         expect(_gunzip.pipe.withArgs(_extract).called).to.be.true
         done()
       })
@@ -84,7 +84,7 @@ describe('unpack', function () {
     describe('entries', function () {
 
       it('should remove preceding "package" from entry path', function (done) {
-        unpack.extract('/test', _res, function (err) {
+        unpack.extract('/test', _res, '.tgz', function (err) {
           expect(_fs.createWriteStream.withArgs(path.join('/test', 'test.js')).called).to.be.true
           done()
         })
@@ -94,7 +94,7 @@ describe('unpack', function () {
 
       describe('directories', function () {
         it('should create directory for directory entries', function (done) {
-          unpack.extract('/test', _res, function (err) {
+          unpack.extract('/test', _res, '.tgz', function (err) {
             expect(_directory.create.withArgs(path.join('/test', 'nested')).called).to.be.true
             done()
           })
@@ -102,7 +102,7 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)
         })
         it('should resume the stream after directory creation', function (done) {
-          unpack.extract('/test', _res, function (err) {
+          unpack.extract('/test', _res, '.tgz', function (err) {
             expect(_entry.resume.called).to.be.true
             done()
           })
@@ -112,7 +112,7 @@ describe('unpack', function () {
       })
       describe('files', function () {
         it('should create dir for entry', function (done) {
-          unpack.extract('/test', _res, function (err) {
+          unpack.extract('/test', _res, '.tgz', function (err) {
             expect(_directory.create.withArgs(path.join('/test', 'nested')).called).to.be.true
             done()
           })
@@ -120,7 +120,7 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)          
         })
         it('should pipe entry into fs write stream', function (done) {
-          unpack.extract('/test', _res, function (err) {
+          unpack.extract('/test', _res, '.tgz', function (err) {
             expect(_entry.pipe.withArgs(_writeStream).called).to.be.true
             done()
           })
@@ -128,7 +128,7 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)          
         })
         it('should preserve the mode on the created file', function (done) {
-          unpack.extract('/test', _res, function (err) {
+          unpack.extract('/test', _res, '.tgz', function (err) {
             expect(_fs.createWriteStream.withArgs(sinon.match.string, {mode:'066'}).called).to.be.true
             done()
           })
@@ -136,9 +136,12 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)
         })
       })
+      describe('zip', function () {
+        
+      })
       describe('other', function () {
         it('should ignore other types of entries', function (done) {
-          unpack.extract('/test', _res, function (err) {
+          unpack.extract('/test', _res, '.tgz', function (err) {
             expect(_entry.resume.called).to.be.true
             done()
           })
