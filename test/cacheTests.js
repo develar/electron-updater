@@ -64,7 +64,7 @@ describe('caching,', function () {
 
       expect(_fs.readFile.calledOnce).to.be.true;
     })
-    
+
     it('should process all queued requests in order', function (done) {
 
       _fs.readFile.callsArgWith(1, null, 'test');
@@ -73,9 +73,11 @@ describe('caching,', function () {
       cache.get(url, '/test', null, _context, _logger, function (err) { 
         if(err) done(err);
         // should always finish first.
+        expect(_unpack.extract.calledOnce).to.be.true;
       });
 
       cache.get(url, '/test', null, _context, _logger, function (err) {
+        // should always finish second.
         expect(_unpack.extract.calledTwice).to.be.true;
         done(err);
       });
