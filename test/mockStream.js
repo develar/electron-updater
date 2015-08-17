@@ -22,7 +22,6 @@ function MockWritable() {
 
 function MockResponseStream(etag, data) {
   Readable.call(this, {});
-  console.log('creating MockResponseStream')
   this._etag = etag ? md5(etag) : null;
   this._data = data;
   this.readData = false;
@@ -32,7 +31,6 @@ function MockResponseStream(etag, data) {
 }
 
 function _read() {
-  console.log('reading...');
   var buf = new Buffer(this._data, 'utf8');
   this.push(buf);
   this.push(null);
@@ -40,13 +38,11 @@ function _read() {
 }
 
 function _write(chunk, encoding, callback) {
-  console.log('writing...');
   this._data = chunk;
   callback();
 }
 
 function _on(type, callback) {
-  console.log('on: ' + type)
   if(type == 'response') {
     callback({
       headers: { etag: `"${this._etag}"` }
