@@ -1,6 +1,6 @@
 {
   "name": "electron-updater",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Cross platform auto-updater for electron applications",
   "main": "index.js",
   "author": "Evolve LLC",
@@ -41,7 +41,8 @@
     "minimist",
     "semver",
     "spin",
-    "tar-stream"
+    "tar-stream",
+    "unzip"
   ],
   "devDependencies": {
     "chai": "^2.3.0",
