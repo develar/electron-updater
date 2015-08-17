@@ -47,6 +47,41 @@ describe('caching,', function () {
     cache = proxyquire('../lib/cache.js', _mocks);
   })
 
+  describe('queuing requests', function () {
+
+    it('should get different urls simultaneously', function () {
+
+      cache.get('http://example.com/test', '/test', null, _context, _logger, function () { });
+      cache.get('http://example.com/test2', '/test', null, _context, _logger, function () { });
+
+      expect(_fs.readFile.calledTwice).to.be.true;
+    })
+
+    it('should not get the same url simultaneously', function () {
+
+      cache.get(url, '/test', null, _context, _logger, function () { });
+      cache.get(url, '/test', null, _context, _logger, function () { });
+
+      expect(_fs.readFile.calledOnce).to.be.true;
+    })
+    
+    it('should process all queued requests in order', function (done) {
+
+      _fs.readFile.callsArgWith(1, null, 'test');
+      _got.stream.returns(new stream.MockResponseStream('test', ''));  
+
+      cache.get(url, '/test', null, _context, _logger, function (err) { 
+        if(err) done(err);
+        // should always finish first.
+      });
+
+      cache.get(url, '/test', null, _context, _logger, function (err) {
+        expect(_unpack.extract.calledTwice).to.be.true;
+        done(err);
+      });
+    })
+  })
+
   describe('when chached file doesnt exist,', function () {
     it('should download desired file', function (done) {
       _fs.readFile.onSecondCall().callsArgWith(1, null, 'test');
@@ -112,6 +147,7 @@ describe('caching,', function () {
           })
         })
       })
+
       describe('and hash in headers doesnt match', function () {
         it('should download', function (done) {
           // local file is bad 
