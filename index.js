@@ -29,6 +29,7 @@ if (argv['electron-update']) {
 	// }
 
 	var appDir = directory.appDir(args.publisher, args.appName)
+	var electronDir = path.dirname(args.exe)
 	var pendingUpdatePath = path.join(appDir, '.update')
 	var logger = new Logger(appDir, Logger.appendToFile, args.debug)
 	
@@ -46,8 +47,8 @@ if (argv['electron-update']) {
 
 	function handleUnexpectedError(err) {
 		logger.error('update failed for an unexected reason.')
-		logger.error(err)
-		file.touch(updatePath, '', function (err) {
+		logger.error(util.inspect(err))
+		file.touch(pendingUpdatePath, '', function (err) {
 			if(err) logger.error(err)
 			var win = new BrowserWindow({
 				width: 800,
@@ -82,7 +83,7 @@ if (argv['electron-update']) {
 			logger.log('Initialized.')
 			event.sender.send('initialize', args)
 
-			commands.update(process.cwd(), logger, function (err) {
+			commands.update(process.cwd(), electronDir, logger, function (err) {
 				logger.log('Finishing update...');
 				if(err) {
 					// If the update fails for security reasons, then we have to attempt to relaunch this process
