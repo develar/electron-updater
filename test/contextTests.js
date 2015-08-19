@@ -7,6 +7,7 @@ describe('context', function () {
   var context,
     _file,
     _fs,
+    _directory,
     _mocks,
     _context
 
@@ -19,9 +20,14 @@ describe('context', function () {
       readFile: sinon.stub(),
       readdir: sinon.stub()
     }
+    _directory = {
+      appDir: sinon.stub().returns('/app')
+    }
     _mocks = {
       './file.js': _file,
-      'fs': _fs
+      './directory.js': _directory,
+      'fs': _fs,
+      'original-fs': _fs
     }
     context = proxyquire('../lib/context.js', _mocks)
   })

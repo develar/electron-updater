@@ -9,6 +9,7 @@ describe('exists', function () {
   var exists,
     _mocks,
     _file,
+    _directory,
     _fs,
     _item
 
@@ -19,9 +20,15 @@ describe('exists', function () {
     _fs = {
       stat: sinon.stub()
     }
+    _directory = {
+      create: sinon.stub().callsArg(1),
+      appDir: sinon.stub().returns('/app')
+    }
     _mocks = {
+      './directory.js': _directory,
       './file.js': _file,
-      'fs': _fs
+      'fs': _fs,
+      'original-fs': _fs
     }
     _item = {
       context: {

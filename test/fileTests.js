@@ -9,6 +9,7 @@ describe('file', function () {
   var file,
     _mocks,
     _file,
+    _directory,
     _fs,
     _item
 
@@ -16,7 +17,11 @@ describe('file', function () {
     _fs = {
       readFile: sinon.stub()
     }
+    _directory = {
+      create: sinon.stub().callsArg(1)
+    }
     _mocks = {
+      './directory.js': _directory,
       'fs': _fs,
       'original-fs': _fs
     }

@@ -12,7 +12,8 @@ describe('copier', function () {
     _fs,
     _directory,
     _context,
-    _files
+    _files,
+    _logger;
 
   beforeEach(function () {
     _file = {
@@ -31,6 +32,9 @@ describe('copier', function () {
       appDir: sinon.stub().returns(path.join('/test'))
     }
     _directory.create.callsArgWith(1)
+    _logger = {
+      log: sinon.stub()
+    }
     _mocks = {
       './file.js': _file,
       './directory.js': _directory,
@@ -95,7 +99,7 @@ describe('copier', function () {
       files: [ { name: 'a.txt' } ]
     }
     addDirs(dirs)
-    copier.copy('/electron.exe', 'app', 'test', function (err) {
+    copier.copy('/electron.exe', 'app', 'test', _logger, function (err) {
       if(err) return done(err)
       expectDirs(dirs)
       done()
@@ -109,7 +113,7 @@ describe('copier', function () {
       ]
     }
     addDirs(dirs)
-    copier.copy('/electron.exe', 'app', 'test', function (err) {
+    copier.copy('/electron.exe', 'app', 'test', _logger, function (err) {
       if(err) return done(err)
       expectDirs(dirs)
       done()
@@ -127,7 +131,7 @@ describe('copier', function () {
       }
     ]}
     addDirs(dirs)
-    copier.copy('/electron.exe', 'app', 'test', function (err) {
+    copier.copy('/electron.exe', 'app', 'test', _logger, function (err) {
       if(err) return done(err)
       expectDirs(dirs)
       done()
@@ -142,7 +146,7 @@ describe('copier', function () {
       }
     ]}
     addDirs(dirs)
-    copier.copy('/electron.exe', 'app', 'test', function (err) {
+    copier.copy('/electron.exe', 'app', 'test', _logger, function (err) {
       if(err) return done(err)
       expectDirs(dirs)
       done()
@@ -160,7 +164,7 @@ describe('copier', function () {
       }
     ]}
     addDirs(dirs)
-    copier.copy('/electron.exe', 'app', 'test', function (err) {
+    copier.copy('/electron.exe', 'app', 'test', _logger, function (err) {
       if(err) return done(err)
       var source = path.join('/', 'resources', 'app', 'test.txt')
       var dest = path.join('/', 'test', 'updater', '1.0.0', 'resources', 'app', 'test.txt')

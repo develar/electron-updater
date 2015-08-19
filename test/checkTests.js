@@ -8,8 +8,9 @@ describe('checking', function () {
     got,
     _file,
     _fs,
+    _directory,
     _mocks,
-    _context
+    _context;
 
   beforeEach(function () {
     _context = {
@@ -26,9 +27,14 @@ describe('checking', function () {
     _fs = {
       stat: sinon.stub()
     }
+    _directory = {
+      appDir: sinon.stub().returns('/app')
+    }
     _mocks = {
       './file.js': _file,
+      './directory.js': _directory,
       'fs': _fs,
+      'original-fs': _fs,
       'got': _got
     }
     checker = proxyquire('../lib/check.js', _mocks)

@@ -12,6 +12,7 @@ describe('update', function () {
         _res,
         _cache,
         _file,
+        _unpack,
         _directory,
         _logger
 
@@ -38,6 +39,9 @@ describe('update', function () {
             remove: sinon.stub(),
             appDir: sinon.stub().returns('/test')
         }
+        _unpack = {
+
+        }
         _logger = {
             log: sinon.stub(),
             info: sinon.stub(),
@@ -47,6 +51,7 @@ describe('update', function () {
         }
         _mocks = {
             'got': _got,
+            './unpack.js': _unpack,
             './cache.js': _cache,
             './file.js': _file,
             './directory.js': _directory,
@@ -72,14 +77,14 @@ describe('update', function () {
                     _deps.context.dev = true
                 })
                 it('should not update the app', function (done) {
-                    update.update(_deps, _logger, function (err) {
+                    update.update(_deps, '/electron', _logger, function (err) {
                         expect(_got.called).to.be.false
                         done(err)
                     })
                 })
             })
             it('should update the app', function (done) {
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_got.called).to.be.true
                     expect(_cache.get.called).to.be.true
                     done(err)
@@ -88,7 +93,7 @@ describe('update', function () {
             it('should download binaries', function (done) {
                 var pkg = { binaries: ['http://example.com/test.tgz'] }
                 _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_cache.get.withArgs('http://example.com/test.tgz').called).to.be.true
                     done(err)
                 })
@@ -96,7 +101,7 @@ describe('update', function () {
         })
         describe('update not available', function () {
             it('should not update the app if its not out of date', function (done) {
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_got.called).to.be.false
                     done(err)
                 })        
@@ -113,14 +118,14 @@ describe('update', function () {
                 _deps.context.dev = true
             })
             it('should not update dependencies', function (done) {
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_got.called).to.be.false
                     done(err)
                 })
             })
         })
         it('should update dependencies', function (done) {
-            update.update(_deps, _logger, function (err) {
+            update.update(_deps, '/electron', _logger, function (err) {
                 expect(_got.called).to.be.true
                 expect(_cache.get.called).to.be.true
                 done(err)
@@ -129,7 +134,7 @@ describe('update', function () {
         it('should download binaries', function (done) {
             var pkg = { binaries: ['http://example.com/test.tgz'] }
             _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
-            update.update(_deps, _logger, function (err) {
+            update.update(_deps, '/electron', _logger, function (err) {
                 expect(_cache.get.withArgs('http://example.com/test.tgz').called).to.be.true
                 done(err)
             })
@@ -141,13 +146,13 @@ describe('update', function () {
                 _file.readJson.onSecondCall().callsArgWith(1, null, pkg)
             })
             it('should get sub dependencies', function (done) {            
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_got.callCount).to.equal(3)
                     done(err)
                 })
             })
             it('should extract sub dependencies', function (done) {            
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_cache.get.calledTwice).to.be.true
                     done(err)
                 })
@@ -161,7 +166,7 @@ describe('update', function () {
         })
         describe('in dev environment', function () {
             it('should update plugins', function (done) {
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_got.called).to.be.true
                     expect(_cache.get.called).to.be.true
                     done(err)
@@ -175,13 +180,13 @@ describe('update', function () {
                 _file.readJson.onSecondCall().callsArgWith(1, null, pkg)
             })
             it('should get sub dependencies', function (done) {            
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron', _logger, function (err) {
                     expect(_got.callCount).to.equal(3)
                     done(err)
                 })
             })
             it('should extract sub dependencies', function (done) {            
-                update.update(_deps, _logger, function (err) {
+                update.update(_deps, '/electron',  _logger, function (err) {
                     expect(_cache.get.calledTwice).to.be.true
                     done(err)
                 })
@@ -190,20 +195,20 @@ describe('update', function () {
         it('should download binaries', function (done) {
             var pkg = { binaries: ['http://example.com/test.tgz'] }
             _file.readJson.onFirstCall().callsArgWith(1, null, pkg)
-            update.update(_deps, _logger, function (err) {
+            update.update(_deps, '/electron', _logger, function (err) {
                 expect(_cache.get.withArgs('http://example.com/test.tgz').called).to.be.true
                 done(err)
             })
         })
         it('should update plugins', function (done) {
-            update.update(_deps, _logger, function (err) {
+            update.update(_deps, '/electron', _logger, function (err) {
                 expect(_got.called).to.be.true
                 expect(_cache.get.called).to.be.true
                 done(err)
             })
         })
         it('should update the .current file', function (done) {
-            update.update(_deps, _logger, function (err) {
+            update.update(_deps, '/electron', _logger, function (err) {
                 expect(_file.writeJson.called).to.be.true
                 done(err)
             })

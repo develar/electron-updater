@@ -14,7 +14,9 @@ describe('command,', function () {
     _ctx,
     _child_process,
     _child,
-    _file
+    _file,
+    _directory,
+    _logger;
 
   beforeEach(function () {
     _context = {
@@ -41,6 +43,12 @@ describe('command,', function () {
     _file = {
       touch: sinon.stub()
     }
+    _directory = {
+      appDir: sinon.stub().returns('/app')
+    }
+    _logger = {
+      default: { log: sinon.stub() }
+    }
     _mocks = {
       './context.js': _context,
       './check.js': _check,
@@ -48,6 +56,8 @@ describe('command,', function () {
       './exists.js': _exists,
       './copier.js': _copier,
       './file.js': _file,
+      './directory.js': _directory,
+      './logger.js': _logger,
       'child_process': _child_process
     }
     commands = proxyquire('../lib/commands.js', _mocks)
@@ -61,8 +71,8 @@ describe('command,', function () {
     _context.load.callsArgWith(1, null, _ctx)
     _check.check.callsArgWith(1, null, [])
     _check.check.onFirstCall().callsArgWith(1, null)
-    _update.update.callsArg(2)
-    _copier.copy.callsArgWith(3, null, '/tmp/app')
+    _update.update.callsArg(3)
+    _copier.copy.callsArgWith(4, null, '/tmp/app')
     _child_process.spawn.returns(_child)
     _file.touch.callsArg(2)
   })

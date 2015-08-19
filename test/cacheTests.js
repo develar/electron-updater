@@ -40,6 +40,7 @@ describe('caching,', function () {
     };
     _mocks = {
       'fs': _fs,
+      'original-fs': _fs,
       'got': _got,
       './unpack': _unpack,
       './directory': _directory

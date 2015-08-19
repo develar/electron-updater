@@ -53,7 +53,8 @@ describe('unpack', function () {
       './directory.js': _directory,
       'zlib': _zlib,
       'tar-stream': _tar,
-      'fs': _fs
+      'fs': _fs,
+      'original-fs': _fs
     }
     unpack = proxyquire('../lib/unpack.js', _mocks)
   })

@@ -16,7 +16,8 @@ describe('directory', function () {
             'mkdir': sinon.stub().callsArgWith(1, new Error())
         }
         _mocks = {
-            'fs': _fs
+            'fs': _fs,
+            'original-fs': _fs
         }
         directory = proxyquire('../lib/directory.js', _mocks)
     })
