@@ -45,21 +45,28 @@ if (argv['electron-update']) {
 		child.unref();
 	}
 
-	function handleUnexpectedError(err) {
+	var unexpectedErrorWindow = null;
+	function handleUnexpectedError(unexpectedError) {
 		logger.error('update failed for an unexected reason.')
-		logger.error(util.inspect(err))
+		logger.error(util.inspect(unexpectedError))
 		file.touch(pendingUpdatePath, '', function (err) {
 			if(err) logger.error(err)
-			var win = new BrowserWindow({
-				width: 800,
-				height: 600
-			})
-			win.on('closed', function () {
-				app.quit()
-			})
-			win.loadUrl('file://' + __dirname + '/error.html')
+			if(!unexpectedErrorWindow) {
+				unexpectedErrorWindow = new BrowserWindow({
+					width: 800,
+					height: 600,
+					'auto-hide-menu-bar': true
+				})
+				unexpectedErrorWindow.on('closed', function () {
+					process.exit(1);
+				})
+				unexpectedErrorWindow.loadUrl('file://' + __dirname + '/error.html')
+				unexpectedErrorWindow.webContents.on('did-finish-load', function() {
+	            	unexpectedErrorWindow.webContents.send('error-info', util.inspect(unexpectedError));
+	            })
+			}
 		})
-	}	
+	}
 	process.on('uncaughtException', handleUnexpectedError)
 
 	logger.log('Starting Update:')

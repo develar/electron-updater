@@ -4,11 +4,17 @@
     <title>Unexpected Error</title>
   </head>
   <body>
-  	<h2>Error</h2>
-    <p>An unexpected error occured while attempting to update your application. Please restart and try again.<p>
+  	<h1 id="error-title">Unexpected Error</h1>
+    <p id="error-message">An unexpected error occured while attempting to update your application. Please restart and try again.<p>
+    <p id="error-info"></p>
   </body>
   <script>
-  // todo: Send error messages via ipc.
-  // todo: Send publisher and issue reporting info from package.json, via ipc.
+  var ipc = require('ipc');
+  var util = require('util');
+
+  ipc.on('error-info', function (err) {
+    console.log('unexpected error');
+    document.getElementById('error-info').innerHTML += err + "<br>";
+  })
   </script>
 </html>
