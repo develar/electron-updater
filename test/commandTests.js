@@ -1,6 +1,7 @@
 var proxyquire = require('proxyquire').noCallThru()
   sinon = require('sinon'),
-  expect = require('chai').expect
+  expect = require('chai').expect,
+  path = require('path');
 
 describe('command,', function () {
 
@@ -299,14 +300,14 @@ describe('command,', function () {
           done(err)
         })
       })
-      it('should touch .update file if app has an udpate available', function (done) {
+      it('should touch .update file if app has an update available', function (done) {
         _check.check.onFirstCall().callsArgWith(1, null, {})
         commands.start(function (err) {
           expect(_file.touch.withArgs(sinon.match.string, 'PENDING').called).to.be.true
           done(err)
         })
       })
-      it('should touch .update file if a dependency has an udpate available', function (done) {
+      it('should touch .update file if a dependency has an update available', function (done) {
         _check.check.onSecondCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
           expect(_file.touch.withArgs(sinon.match.string, 'PENDING').called).to.be.true
@@ -370,7 +371,7 @@ describe('command,', function () {
           done(err)
         })
       })
-      it('should emit the udpateRequired event', function (done) {
+      it('should emit the updateRequired event', function (done) {
         commands.start(function (err) {
           expect(_updateRequired.called).to.be.true
           done(err)
