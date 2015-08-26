@@ -28,15 +28,18 @@ program
 	})
 
 program
-	.command('watch [appdir]')
+	.command('notify [appdir]')
 	.description('Watch for updates on an interval.')
 	.action(function (appdir) {
 		help = false
 		var logger = new Logger(null, Logger.appendToConsole, program.verbose)
-		commands.watch(appdir || process.cwd(), logger, function (err, update) {
-			if(err) return console.error(error)
-			console.log('update: ' + util.inspect(update))
-		})
+		var notifier = commands.notify(appdir || process.cwd(), logger);
+		notifier.on('error', function (err) {
+			console.error(error);
+		});
+		notifier.on('updateAvailable', function (update) {
+			console.log('update: ' + util.inspect(update));
+		});
 	})
 
 program
