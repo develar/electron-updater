@@ -28,7 +28,7 @@ describe('caching,', function () {
       createWriteStream: sinon.stub().returns(new stream.MockWritable())
     };
     _unpack = {
-      extract: sinon.stub().callsArgWith(3, null)
+      extract: sinon.stub().callsArgWith(4, null)
     };
     _directory = {
       create: sinon.stub().callsArgWith(1, null),
@@ -48,20 +48,20 @@ describe('caching,', function () {
     cache = proxyquire('../lib/cache.js', _mocks);
   })
 
-  describe('queuing requests', function () {
+  describe('queuing requests,', function () {
 
     it('should get different urls simultaneously', function () {
 
-      cache.get('http://example.com/test', '/test', null, _context, _logger, function () { });
-      cache.get('http://example.com/test2', '/test', null, _context, _logger, function () { });
+      cache.get('http://example.com/test', '/test', 0, null, _context, _logger, function () { });
+      cache.get('http://example.com/test2', '/test', 0, null, _context, _logger, function () { });
 
       expect(_fs.readFile.calledTwice).to.be.true;
     })
 
     it('should not get the same url simultaneously', function () {
 
-      cache.get(url, '/test', null, _context, _logger, function () { });
-      cache.get(url, '/test', null, _context, _logger, function () { });
+      cache.get(url, '/test', 0, null, _context, _logger, function () { });
+      cache.get(url, '/test', 0, null, _context, _logger, function () { });
 
       expect(_fs.readFile.calledOnce).to.be.true;
     })
@@ -71,13 +71,13 @@ describe('caching,', function () {
       _fs.readFile.callsArgWith(1, null, 'test');
       _got.stream.returns(new stream.MockResponseStream('test', ''));  
 
-      cache.get(url, '/test', null, _context, _logger, function (err) { 
+      cache.get(url, '/test', 0, null, _context, _logger, function (err) { 
         if(err) done(err);
         // should always finish first.
         expect(_unpack.extract.calledOnce).to.be.true;
       });
 
-      cache.get(url, '/test', null, _context, _logger, function (err) {
+      cache.get(url, '/test', 0, null, _context, _logger, function (err) {
         // should always finish second.
         expect(_unpack.extract.calledTwice).to.be.true;
         done(err);
@@ -89,7 +89,7 @@ describe('caching,', function () {
     it('should download desired file', function (done) {
       _fs.readFile.onSecondCall().callsArgWith(1, null, 'test');
       _got.stream.onSecondCall().returns(new stream.MockResponseStream('test', ''));
-      cache.get(url, '/test', null, _context, _logger, function (err) {        
+      cache.get(url, '/test', 0, null, _context, _logger, function (err) {        
         expect(_got.stream.called).to.be.true
         done(err)
       })
@@ -110,7 +110,7 @@ describe('caching,', function () {
         // After download, content is correct.
         _fs.readFile.onSecondCall().callsArgWith(1, null, 'test');
 
-        cache.get(url, '/test', expectedHash, _context, _logger, function (err) {
+        cache.get(url, '/test', 0, expectedHash, _context, _logger, function (err) {
           expect(_got.stream().readData).to.be.true;
           done(err)
         })
@@ -119,7 +119,7 @@ describe('caching,', function () {
       it('should extract if the hash matches', function (done) {
         // File contains correct data
         _fs.readFile.callsArgWith(1, null, 'test');
-        cache.get(url, '/test', expectedHash, _context, _logger, function (err) {
+        cache.get(url, '/test', 0, expectedHash, _context, _logger, function (err) {
           expect(_unpack.extract.called).to.be.true;
           done(err)
         })
@@ -137,14 +137,14 @@ describe('caching,', function () {
         })
 
         it('should download headers only', function (done) {
-            cache.get(url, '/test', null, _context, _logger, function (err) {
+            cache.get(url, '/test', 0, null, _context, _logger, function (err) {
               expect(_got.stream().readData).to.be.false;
               done(err)
             })
         })
 
         it('should extract', function (done) {
-          cache.get(url, '/test', null, _context, _logger, function (err) {
+          cache.get(url, '/test', 0, null, _context, _logger, function (err) {
             expect(_unpack.extract.called).to.be.true;
             done(err)
           })
@@ -161,7 +161,7 @@ describe('caching,', function () {
           _fs.readFile.onSecondCall().callsArgWith(1, null, 'test123');
           _got.stream.onSecondCall().returns(new stream.MockResponseStream('test123', '')); // now they match
 
-          cache.get(url, '/test', null, _context, _logger, function (err) {
+          cache.get(url, '/test', 0, null, _context, _logger, function (err) {
             expect(_got.stream.called).to.be.true;
             done(err)
           })
