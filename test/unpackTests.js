@@ -4,7 +4,7 @@ var expect = require('chai').expect
     proxyquire = require('proxyquire').noCallThru()
     path = require('path')
 
-describe('unpack', function () {
+describe('unpack,', function () {
 
   var unpack,
     _mocks,
@@ -33,7 +33,7 @@ describe('unpack', function () {
     _cb = sinon.stub()
     _writeStream = sinon.stub()
     _entry = {
-      pipe: sinon.stub(),
+      pipe: sinon.stub().returns({ on: sinon.stub()}),
       resume: sinon.stub(),
       on: sinon.stub()
     }
@@ -59,33 +59,33 @@ describe('unpack', function () {
     unpack = proxyquire('../lib/unpack.js', _mocks)
   })
 
-  describe('extract', function () {
+  describe('extract,', function () {
     it('should create the directory extracting to', function (done) {
-      unpack.extract('/test', _res, '.tgz', function (err) {
+      unpack.extract('/test', _res, '.tgz', 0, function (err) {
         expect(_directory.create.withArgs('/test').called).to.be.true
         done()
       })
       _extract.on.withArgs('finish').callArg(1)
     })
     it('should gunzip', function (done) {
-      unpack.extract('/test', _res, '.tgz', function (err) {
+      unpack.extract('/test', _res, '.tgz', 0, function (err) {
         expect(_res.pipe.withArgs(_gunzip).called).to.be.true
         done()
       })
       _extract.on.withArgs('finish').callArg(1)      
     })
     it('should tar extract', function (done) {
-      unpack.extract('/test', _res, '.tgz', function (err) {
+      unpack.extract('/test', _res, '.tgz', 0, function (err) {
         expect(_gunzip.pipe.withArgs(_extract).called).to.be.true
         done()
       })
       _extract.on.withArgs('finish').callArg(1)
     })
 
-    describe('entries', function () {
+    describe('entries,', function () {
 
       it('should remove preceding "package" from entry path', function (done) {
-        unpack.extract('/test', _res, '.tgz', function (err) {
+        unpack.extract('/test', _res, '.tgz', 1, function (err) {
           expect(_fs.createWriteStream.withArgs(path.join('/test', 'test.js')).called).to.be.true
           done()
         })
@@ -95,7 +95,7 @@ describe('unpack', function () {
 
       describe('directories', function () {
         it('should create directory for directory entries', function (done) {
-          unpack.extract('/test', _res, '.tgz', function (err) {
+          unpack.extract('/test', _res, '.tgz', 1, function (err) {
             expect(_directory.create.withArgs(path.join('/test', 'nested')).called).to.be.true
             done()
           })
@@ -103,7 +103,7 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)
         })
         it('should resume the stream after directory creation', function (done) {
-          unpack.extract('/test', _res, '.tgz', function (err) {
+          unpack.extract('/test', _res, '.tgz', 1, function (err) {
             expect(_entry.resume.called).to.be.true
             done()
           })
@@ -111,17 +111,26 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)
         })
       })
-      describe('files', function () {
+
+      describe('files,', function () {
         it('should create dir for entry', function (done) {
-          unpack.extract('/test', _res, '.tgz', function (err) {
-            expect(_directory.create.withArgs(path.join('/test', 'nested')).called).to.be.true
+          unpack.extract('/test', _res, '.tgz', 0, function (err) {
+            expect(_directory.create.withArgs(path.join('/test', 'package/nested')).called).to.be.true
             done()
           })
           _extract.on.withArgs('entry').callArgWith(1, {name: 'package/nested/test.js', type: 'file'}, _entry, _cb)
           _extract.on.withArgs('finish').callArg(1)          
         })
+        it('should strip dirs for entry', function (done) {
+          unpack.extract('/test', _res, '.tgz', 2, function (err) {
+            expect(_directory.create.withArgs(path.join('/test', 'deeper')).called).to.be.true
+            done()
+          })
+          _extract.on.withArgs('entry').callArgWith(1, {name: 'package/nested/deeper/test.js', type: 'file'}, _entry, _cb)
+          _extract.on.withArgs('finish').callArg(1)          
+        })
         it('should pipe entry into fs write stream', function (done) {
-          unpack.extract('/test', _res, '.tgz', function (err) {
+          unpack.extract('/test', _res, '.tgz', 0, function (err) {
             expect(_entry.pipe.withArgs(_writeStream).called).to.be.true
             done()
           })
@@ -129,7 +138,7 @@ describe('unpack', function () {
           _extract.on.withArgs('finish').callArg(1)          
         })
         it('should preserve the mode on the created file', function (done) {
-          unpack.extract('/test', _res, '.tgz', function (err) {
+          unpack.extract('/test', _res, '.tgz', 0, function (err) {
             expect(_fs.createWriteStream.withArgs(sinon.match.string, {mode:'066'}).called).to.be.true
             done()
           })
@@ -140,9 +149,9 @@ describe('unpack', function () {
       describe('zip', function () {
         
       })
-      describe('other', function () {
+      describe('other,', function () {
         it('should ignore other types of entries', function (done) {
-          unpack.extract('/test', _res, '.tgz', function (err) {
+          unpack.extract('/test', _res, '.tgz', 0, function (err) {
             expect(_entry.resume.called).to.be.true
             done()
           })
