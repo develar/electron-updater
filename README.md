@@ -76,8 +76,12 @@ Add a path to your registry in the applications `package.json`:
 ```
   "registry": "http://npm.mycompany.com:4873",
 ```
+To tell npm to use this registry also, create a [.npmrc file](https://docs.npmjs.com/files/npmrc) in your application root directory containing:
+```
+registry=http://npm.mycompany.com:4873
+```
 
-Fortunately, hosting your own npm server is very easy to do by using [sinopia](http://npmjs.org/packages/sinopia).
+Fortunately, hosting your own npm server is very easy to do with [sinopia](http://npmjs.org/packages/sinopia).
 ```
 $ npm install sinopia -g
 $ sinopia
@@ -105,6 +109,9 @@ When your application runs it will download and install these plugins into your 
  * Load arbitrary plugins using [electron-plugins](https://npmjs.org/packages/electron-plugins), instead of having fixed dependencies only.
 
 In the `userData` folder there is also a `.current` file created, which is used to maintain the list of currently installed plugins. You can add items to that file to install non-default plugins.
+
+# Distributing binaries
+TODO...
 
 ### Related
 See the [`electron-builder`](https://www.npmjs.com/package/electron-builder) project for creating installers for
