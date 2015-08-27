@@ -4,11 +4,13 @@ Cross platform auto-updater for electron apps
 [![Build Status](https://travis-ci.org/EvolveLabs/electron-updater.svg?branch=master)](https://travis-ci.org/EvolveLabs/electron-updater)
 
 # Install
-There are two separate packages that make up the `electron-updater`. The updater itself runs in your app's main process while the plugins project loads the plugins downloaded by the updater into the render process. If you don't use plugins, then you don't need the second project.
+There are three main packages that make up the `electron-updater`. 
 
     $ npm install electron-updater --save
     $ npm install electron-plugins --save
     $ npm install electron-updater-tools -g
+    
+The [electron-updater](htps://npmjs.org/package/electron-updater) package itself runs in your app's main process and does the actual updating. The [electron-plugins](https://npmjs.org/package/electron-plugins) project specifically loads the plugins downloaded by the updater in the render process. The third project, [electron-updater-tools](https://npmjs.org/package/electron-updater-tools) contains various scripts useful for building native electron addons as well as linking plugins during development time.
     
 # Usage
 Integrate the electron-updater into your electron main process. Below is a simplified example of the [Electron Quick Start](http://electron.atom.io/docs/latest/tutorial/quick-start/#write-your-first-electron-app) code with the `electron-updater` mixed in.
