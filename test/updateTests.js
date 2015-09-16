@@ -60,7 +60,7 @@ describe('update', function () {
         update = proxyquire('../lib/update.js', _mocks)
 
         _got.withArgs(sinon.match.string, {json:true}).callsArgWith(2, null, { versions: { '1.0.0': {}, '1.0.1': {} }, dist: { tarball: 'http://test.com/update.tgz' } })
-        _cache.get.callsArgWith(5, null)
+        _cache.get.callsArgWith(6, null)
         _file.readJson.callsArgWith(1, null, { dependencies: {} })
         _file.writeJson.callsArgWith(2, null)
         _directory.create.callsArgWith(1, null)
