@@ -1,7 +1,8 @@
 var proxyquire = require('proxyquire').noCallThru()
   sinon = require('sinon'),
   expect = require('chai').expect,
-  path = require('path');
+  path = require('path'),
+  MockNotifier = require('./mockNotifier');
 
 describe('command,', function () {
 
@@ -17,7 +18,8 @@ describe('command,', function () {
     _child,
     _file,
     _directory,
-    _logger;
+    _logger,
+    _notifier;
 
   beforeEach(function () {
     _context = {
@@ -48,8 +50,9 @@ describe('command,', function () {
       appDir: sinon.stub().returns('/app')
     }
     _logger = {
-      default: { log: sinon.stub() }
+      default: { log: sinon.stub(), error: sinon.stub() }
     }
+    _notifier = new MockNotifier()
     _mocks = {
       './context.js': _context,
       './check.js': _check,
@@ -59,6 +62,7 @@ describe('command,', function () {
       './file.js': _file,
       './directory.js': _directory,
       './logger.js': _logger,
+      './notifier.js': function () { return _notifier },
       'child_process': _child_process
     }
     commands = proxyquire('../lib/commands.js', _mocks)
@@ -303,6 +307,7 @@ describe('command,', function () {
       it('should touch .update file if app has an update available', function (done) {
         _check.check.onFirstCall().callsArgWith(1, null, {})
         commands.start(function (err) {
+          _notifier.emit('updateAvailable', {app:true});
           expect(_file.touch.withArgs(sinon.match.string, 'PENDING').called).to.be.true
           done(err)
         })
@@ -310,6 +315,7 @@ describe('command,', function () {
       it('should touch .update file if a dependency has an update available', function (done) {
         _check.check.onSecondCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
+          _notifier.emit('updateAvailable', {dependencies:[true]});
           expect(_file.touch.withArgs(sinon.match.string, 'PENDING').called).to.be.true
           done(err)
         })
@@ -317,6 +323,7 @@ describe('command,', function () {
       it('should emit update available if app has a update available', function (done) {
         _check.check.onFirstCall().callsArgWith(1, null, {})
         commands.start(function (err) {
+          _notifier.emit('updateAvailable', {app:true});
           expect(_updateAvailable.called).to.be.true
           done(err)
         })
@@ -324,6 +331,7 @@ describe('command,', function () {
       it('should emit updateAvailable if a dependency has a update available', function (done) {
         _check.check.onSecondCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
+          _notifier.emit('updateAvailable', {dependencies:[true]});
           expect(_updateAvailable.called).to.be.true
           done(err)
         })
@@ -331,6 +339,7 @@ describe('command,', function () {
       it('should do update if plugins have update available', function (done) {
         _check.check.onThirdCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
+          _notifier.emit('updateAvailable', {plugins:[true], dependencies:[]});
           expect(_update.update.called).to.be.true
           done(err)
         })
@@ -338,6 +347,7 @@ describe('command,', function () {
       it('should emit updateAvailable if it updates plugins', function (done) {
         _check.check.onThirdCall().callsArgWith(1, null, [true])
         commands.start(function (err) {
+          _notifier.emit('updateAvailable', {plugins:[true], dependencies:[]});
           expect(_updateAvailable.called).to.be.true
           done(err)
         })
