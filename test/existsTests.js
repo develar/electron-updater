@@ -4,7 +4,7 @@ var expect = require('chai').expect
     proxyquire = require('proxyquire').noCallThru()
     path = require('path')
 
-describe('exists', function () {
+describe('[exists]', function () {
 
   var exists,
     _mocks,
@@ -15,7 +15,8 @@ describe('exists', function () {
 
   beforeEach(function () {
     _file = { 
-      readJson: sinon.stub() 
+      readJson: sinon.stub(),
+      isLink: sinon.stub().callsArgWith(1, false),
     }
     _fs = {
       stat: sinon.stub()
@@ -36,13 +37,17 @@ describe('exists', function () {
         appDir: path.join('/'),
         dependencies: { },
         plugins: { }
+      },
+      logger: {
+        log: sinon.stub(),
+        error: sinon.stub(),
       }
     }
     exists = proxyquire('../lib/exists.js', _mocks)
     _fs.stat.callsArgWith(1, 'ENOENT')
   })
 
-  describe('dependencies', function () {
+  describe('when dependencies', function () {
 
     beforeEach(function () {
       _item.kind = 'dependencies'
@@ -51,7 +56,7 @@ describe('exists', function () {
       }
     })
 
-    describe('actually exist', function () {
+    describe('actually exist:', function () {
       beforeEach(function () {
         _file.readJson.callsArgWith(1, null, {version: '1.0.0'})
       })
@@ -84,7 +89,7 @@ describe('exists', function () {
       })
     })
 
-    describe('actually missing', function () {
+    describe('actually missing:', function () {
       beforeEach(function () {
         _file.readJson.callsArgWith(1, {})
       })
@@ -120,7 +125,7 @@ describe('exists', function () {
         'test-plugin': '^1.0.0'
       }
     })
-    describe('actually exist', function () {
+    describe('actually exist:', function () {
       beforeEach(function () {
         _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0'})
         _fs.stat.onSecondCall().callsArgWith(1, null, {})
@@ -164,7 +169,7 @@ describe('exists', function () {
       })
     })
 
-    describe('actually missing', function () {
+    describe('actually missing:', function () {
       beforeEach(function () {
         _file.readJson.callsArgWith(1, null, {'test-plugin': '1.0.0'})
       })
@@ -177,7 +182,7 @@ describe('exists', function () {
       })
       it('should return false when single plugin is missing', function (done) {
         exists.check(_item, function (err, result) {
-          if(err) return done(err)
+          if(err) return done(err);
           expect(result).to.be.false
           done()
         })

@@ -100,13 +100,13 @@ describe('command,', function () {
     })
     it('should check dependencies', function (done) {
       commands.isValid(function (err, result) {
-        expect(_exists.check.calledWith({kind:'dependencies', context: _ctx})).to.be.true
+        expect(_exists.check.calledWith({kind:'dependencies', context: _ctx, logger: sinon.match.object})).to.be.true
         done(err)
       })
     })
     it('should check plugins', function (done) {
       commands.isValid(function (err, result) {
-        expect(_exists.check.calledWith({kind:'plugins', context: _ctx})).to.be.true
+        expect(_exists.check.calledWith({kind:'plugins', context: _ctx, logger: sinon.match.object})).to.be.true
         done(err)
       })
     })

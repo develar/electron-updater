@@ -1,7 +1,6 @@
 var commands = require('./lib/commands.js'),
 	util = require('util'),
 	fs = require('fs'),
-	app = require('app'),
 	spawn = require('child_process').spawn,
 	ipc = require('ipc'),
 	minimist = require('minimist'),
@@ -10,11 +9,14 @@ var commands = require('./lib/commands.js'),
 	file = require('./lib/file.js'),
 	watcher = require('./lib/watcher.js'),
 	errors = require('./lib/errors.js'),
-	Logger = require('./lib/logger.js'),
-	BrowserWindow = require('browser-window');
+	Logger = require('./lib/logger.js');
 
 var argv = minimist(process.argv.slice(2));
 if (argv['electron-update']) {
+
+	// These modules are not available in render process.
+	var app = require('app'); 
+	var BrowserWindow = require('browser-window');
 
 	var relaunch = typeof argv.relaunch === 'boolean' ? argv.relaunch : true
 	var encodedArgs = argv['electron-update']
@@ -76,7 +78,7 @@ if (argv['electron-update']) {
 							// Watch for changes to the .update file, it will become empty when the update succeeds.
 							watcher.watch(pendingUpdatePath, function (err) {
 								if (err) return errors.handle(err);
-								file.touch(pendingUpdatePath, function () {
+								file.touch(pendingUpdatePath, '', function () {
 									if (relaunch) {
 										logger.log('relaunching from unelevated process.')
 										launch.detached(args, logger)
