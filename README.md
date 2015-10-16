@@ -59,6 +59,25 @@ ipc.on('update-available', function () {
 })
 ```
 
+# Error handling
+By default errors are logged to both the console and a file. The default log file location is obtained by getting the [AppDirectory.userData()](https://www.npmjs.com/package/appdirectory) folder: `{userData}/logs/updater.log`. Additionally you can replace the default logger or simply handle errors manually with the below optional API's:
+
+```
+updater.on('error', function (err) {
+  // todo: manually handle errors here in addition to default logger behavior...
+});
+
+// The logger signature is essentially the same as the console.
+var customLogger = {
+  log: console.log,
+  error: console.error,
+  info: console.info,
+  warn: console.warn,
+  debug: console.debug
+};
+updater.start(customLogger);
+```
+
 # Publishing Updates
 There are two kinds of updates you can publish:
  * The Application itself
