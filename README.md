@@ -10,6 +10,8 @@ There are three main packages that make up the `electron-updater`.
     $ npm install electron-plugins --save
     $ npm install electron-updater-tools -g
     
+> **NOTE:** Requires electron version `>=0.33.3`.
+    
 The [electron-updater](htps://npmjs.org/package/electron-updater) package itself runs in your app's main process and does the actual updating. The [electron-plugins](https://npmjs.org/package/electron-plugins) project specifically loads the plugins downloaded by the updater in the render process. The third project, [electron-updater-tools](https://npmjs.org/package/electron-updater-tools) contains various scripts useful for building native electron addons as well as linking plugins during development time.
     
 # Usage
