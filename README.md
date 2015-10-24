@@ -134,7 +134,9 @@ When your application runs it will download and install these plugins into your 
 In the `userData` folder there is also a `.current` file created, which is used to maintain the list of currently installed plugins. You can add items to that file to install non-default plugins.
 
 # Distributing binaries
-TODO...
+Until there is better documentation on this, see these issues for answers:
+ * https://github.com/EvolveLabs/electron-updater/issues/21
+ * https://github.com/EvolveLabs/electron-updater/issues/10
 
 ### Related
 See the [`electron-builder`](https://www.npmjs.com/package/electron-builder) project for creating installers for
