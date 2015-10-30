@@ -117,9 +117,9 @@ describe('update', function () {
             beforeEach(function () {
                 _deps.context.dev = true
             })
-            it('should not update dependencies', function (done) {
+            it('should update dependencies', function (done) {
                 update.update(_deps, '/electron', _logger, function (err) {
-                    expect(_got.called).to.be.false
+                    expect(_got.called).to.be.true
                     done(err)
                 })
             })
