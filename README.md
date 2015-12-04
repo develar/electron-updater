@@ -46,7 +46,7 @@ app.on('ready', function() {
 ## Example index.js (running in render process)
 ```JavaScript
 var plugins = require('electron-plugins'),
-  electron = require('electron')
+  electron = require('electron'),
 	ipc = electron.ipcRenderer
 
 document.addEventListener('DOMContentLoaded', function () {
