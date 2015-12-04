@@ -9,7 +9,8 @@
     <p id="error-info"></p>
   </body>
   <script>
-  var ipc = require('ipc');
+  var electron = require('electron'),
+      ipc = electron.ipcRenderer;
   var util = require('util');
 
   ipc.on('error-info', function (err) {

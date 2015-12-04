@@ -1,8 +1,9 @@
 var commands = require('./lib/commands.js'),
+	electron = require('electron'),
 	util = require('util'),
 	fs = require('fs'),
 	spawn = require('child_process').spawn,
-	ipc = require('ipc'),
+	ipc = electron.ipcMain,
 	minimist = require('minimist'),
 	launch = require('./lib/launch.js'),
 	directory = require('./lib/directory.js'),
@@ -55,7 +56,7 @@ if (argv['electron-update']) {
 		win.on('close', function (e) {
 			logger.log('Window is closing...')
 		})
-		win.loadUrl('file://' + __dirname + '/update.html')
+		win.loadURL('file://' + __dirname + '/update.html')
 		
 		ipc.on('initialize', function (event, arg) {
 			logger.log('Initialized.')
