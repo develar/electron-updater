@@ -16,10 +16,10 @@
   </body>
   <script>
   	var electron = require('electron'),
-        ipc = electron.ipc,
+        ipc = electron.ipcRenderer,
   		  util = require('util');
-        
-    document.addEventListener("DOMContentLoaded", function(event) {      
+
+    document.addEventListener("DOMContentLoaded", function(event) {
       var spinnerElement = document.getElementById('spinner');
       var nameElement = document.getElementById('name');
       new Spinner({color:'#000', lines: 12}).spin(spinnerElement);
