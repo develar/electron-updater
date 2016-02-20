@@ -15,14 +15,14 @@
   	</div>
   </body>
   <script>
-  	var ipc = require('ipc'),
-  		  util = require('util');
-        
-    document.addEventListener("DOMContentLoaded", function(event) {      
+  	var electron = require('electron'),
+        ipc = electron.ipcRenderer;
+
+    document.addEventListener("DOMContentLoaded", function(event) {
       var spinnerElement = document.getElementById('spinner');
       var nameElement = document.getElementById('name');
       new Spinner({color:'#000', lines: 12}).spin(spinnerElement);
-      ipc.on('initialize', function(arg) {
+      ipc.on('initialize', function(event, arg) {
         nameElement.innerHTML = arg.appName;
       });
       ipc.send('initialize');

@@ -27,7 +27,7 @@ var mainWindow = null
 app.on('ready', function() {
     updater.on('ready', function () {
         mainWindow = new BrowserWindow({width: 800, height: 600})
-        mainWindow.loadUrl('file://' + __dirname + '/index.html')
+        mainWindow.loadURL('file://' + __dirname + '/index.html')
         mainWindow.openDevTools({detach:true})        
         mainWindow.on('closed', function() {
             mainWindow = null;
@@ -46,7 +46,8 @@ app.on('ready', function() {
 ## Example index.js (running in render process)
 ```JavaScript
 var plugins = require('electron-plugins'),
-	ipc = require('ipc')
+  electron = require('electron'),
+	ipc = electron.ipcRenderer
 
 document.addEventListener('DOMContentLoaded', function () {
 	var context = { document: document }
