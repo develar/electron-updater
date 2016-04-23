@@ -17,7 +17,8 @@
     "url": "https://github.com/evolvelabs/electron-updater/issues"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "watch": "mocha --watch"
   },
   "bin": {
     "electron-updater": "./bin/cli",
