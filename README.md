@@ -4,7 +4,10 @@ Cross platform auto-updater for electron apps
 [![Build Status](https://travis-ci.org/EvolveLabs/electron-updater.svg?branch=master)](https://travis-ci.org/EvolveLabs/electron-updater)
 
 # NOTE
-**This project is in maintainance only mode. It is recommended that you use the `electron-packager` and `electron-builder` projects to generate complete installable versions of your applications and use either the OS specific stores or some other mechanism for distributing your installers.**
+
+**Project on NPM since version 1.0.0 is a part of [electron-builder](https://github.com/electron-userland/electron-builder/tree/master/packages/electron-updater).**
+
+**This original project is in maintainance only mode. It is recommended that you use the `electron-builder` project to generate complete installable versions of your applications and use either the OS specific stores or some other mechanism for distributing your installers.**
 
 # Install
 There are three main packages that make up the `electron-updater`. 
